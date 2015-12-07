@@ -87,9 +87,9 @@ public class OkHttpRequest {
                 RequestBody requestBody = params.buildRequestBody();
                 if (requestProgressListener != null) {
                     requestBody =
-                            OkHttpProgressHelper.wrappedRequestProgress(
-                                    requestBody, requestProgressListener);
+                            OkHttpProgressHelper.wrappedRequestProgress(requestBody, requestProgressListener);
                 }
+                
                 if (headers == null) {
                     return new Request.Builder().tag(tag).url(url).post(requestBody).build();
                 } else {
