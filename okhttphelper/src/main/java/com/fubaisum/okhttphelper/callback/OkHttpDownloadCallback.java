@@ -43,7 +43,7 @@ public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
         int readBytesCount;
         FileOutputStream fileOutputStream = null;
         try {
-            File file = new File(getDirectory(), getFileName());
+            File file = new File(directory, fileName);
             fileOutputStream = new FileOutputStream(file);
             while ((readBytesCount = inputStream.read(buffer)) != -1) {
                 fileOutputStream.write(buffer, 0, readBytesCount);
@@ -57,12 +57,12 @@ public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
             try {
                 if (null != inputStream) inputStream.close();
             } catch (IOException e) {
-                //ignore
+                e.printStackTrace();
             }
             try {
                 if (null != fileOutputStream) fileOutputStream.close();
             } catch (IOException e) {
-                //ignore
+                e.printStackTrace();
             }
         }
     }

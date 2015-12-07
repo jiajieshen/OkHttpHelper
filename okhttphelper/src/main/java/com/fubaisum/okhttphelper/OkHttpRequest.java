@@ -1,5 +1,6 @@
 package com.fubaisum.okhttphelper;
 
+import android.os.Build;
 import android.support.annotation.CheckResult;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -8,6 +9,8 @@ import com.fubaisum.okhttphelper.callback.OkHttpCallback;
 import com.fubaisum.okhttphelper.params.OkHttpParams;
 import com.fubaisum.okhttphelper.progress.OkHttpProgressHelper;
 import com.fubaisum.okhttphelper.progress.OkHttpProgressListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
@@ -17,6 +20,7 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Modifier;
 
 /**
  * Created by sum on 15-12-5.
@@ -99,13 +103,14 @@ public class OkHttpRequest {
     @NonNull
     private OkHttpClient getOkHttpClient() {
         if (responseProgressListener == null) {
-            return OkHttpManager.getOkHttpClient();
+            return OkHttpClientSingleton.getOkHttpClient();
+        } else {
+            OkHttpClient clone = OkHttpClientSingleton.getOkHttpClient().clone();
+            Interceptor interceptor =
+                    OkHttpProgressHelper.newResponseProgressInterceptor(responseProgressListener);
+            clone.networkInterceptors().add(interceptor);
+            return clone;
         }
-        OkHttpClient clone = OkHttpManager.getOkHttpClient().clone();
-        Interceptor interceptor =
-                OkHttpProgressHelper.newResponseProgressInterceptor(responseProgressListener);
-        clone.networkInterceptors().add(interceptor);
-        return clone;
     }
 
     public InputStream byteStream() throws IOException {
@@ -124,7 +129,7 @@ public class OkHttpRequest {
         if (tClass == String.class) {
             return (T) responseStr;
         } else {
-            return OkHttpManager.getGson().fromJson(responseStr, tClass);
+            return getGson().fromJson(responseStr, tClass);
         }
     }
 
@@ -141,6 +146,28 @@ public class OkHttpRequest {
     public void cancel(Object tag) {
         if (okHttpClient != null) {
             okHttpClient.cancel(tag);
+        }
+    }
+
+    private static Gson getGson() {
+        return GsonHolder.gson;
+    }
+
+    private static class GsonHolder {
+        private static final Gson gson;
+
+        static {
+            final int sdk = Build.VERSION.SDK_INT;
+            if (sdk >= Build.VERSION_CODES.M) {
+                GsonBuilder gsonBuilder = new GsonBuilder()
+                        .excludeFieldsWithModifiers(
+                                Modifier.FINAL,
+                                Modifier.TRANSIENT,
+                                Modifier.STATIC);
+                gson = gsonBuilder.create();
+            } else {
+                gson = new Gson();
+            }
         }
     }
 
@@ -203,7 +230,7 @@ public class OkHttpRequest {
         }
 
         @CheckResult
-        public OkHttpRequest post(OkHttpParams params) {
+        public OkHttpRequest post(@NonNull OkHttpParams params) {
             build();
             OkHttpRequest request =
                     new OkHttpRequest(tag, url, headers, requestProgressListener, responseProgressListener);

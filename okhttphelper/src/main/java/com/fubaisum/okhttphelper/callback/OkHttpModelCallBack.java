@@ -1,11 +1,15 @@
 package com.fubaisum.okhttphelper.callback;
 
-import com.fubaisum.okhttphelper.OkHttpManager;
+import android.os.Build;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.internal.$Gson$Types;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -14,7 +18,22 @@ import java.lang.reflect.Type;
  */
 public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
 
+    private static final Gson gson;
     private Type modelType;
+
+    static {
+        final int sdk = Build.VERSION.SDK_INT;
+        if (sdk >= Build.VERSION_CODES.M) {
+            GsonBuilder gsonBuilder = new GsonBuilder()
+                    .excludeFieldsWithModifiers(
+                            Modifier.FINAL,
+                            Modifier.TRANSIENT,
+                            Modifier.STATIC);
+            gson = gsonBuilder.create();
+        } else {
+            gson = new Gson();
+        }
+    }
 
     public OkHttpModelCallBack() {
         modelType = getSuperclassTypeParameter(getClass());
@@ -38,16 +57,15 @@ public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
     public void onResponse(Response response) throws IOException {
         if (!response.isSuccessful()) {
             sendFailureCallback(new RuntimeException(response.toString()));
-        }else{
+        } else {
             String responseStr = response.body().string();
             if (modelType == String.class) {
                 sendSuccessCallback((T) responseStr);
             } else {
-                T result = OkHttpManager.getGson().fromJson(responseStr, modelType);
+                T result = gson.fromJson(responseStr, modelType);
                 sendSuccessCallback(result);
             }
         }
-
     }
 
 }

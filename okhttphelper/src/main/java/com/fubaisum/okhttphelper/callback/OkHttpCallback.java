@@ -1,8 +1,9 @@
 package com.fubaisum.okhttphelper.callback;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.IntDef;
 
-import com.fubaisum.okhttphelper.OkHttpManager;
 import com.squareup.okhttp.Callback;
 
 /**
@@ -27,7 +28,7 @@ public abstract class OkHttpCallback<T> implements Callback {
     protected void sendFailureCallback(final Exception e) {
         switch (callbackMode) {
             case UI: {
-                OkHttpManager.getMainHandler().post(new Runnable() {
+                getMainHandler().post(new Runnable() {
                     @Override
                     public void run() {
                         onResponseError(e);
@@ -45,7 +46,7 @@ public abstract class OkHttpCallback<T> implements Callback {
     protected void sendSuccessCallback(final T result) {
         switch (callbackMode) {
             case UI: {
-                OkHttpManager.getMainHandler().post(new Runnable() {
+                getMainHandler().post(new Runnable() {
                     @Override
                     public void run() {
                         onResponseSuccess(result);
@@ -63,5 +64,17 @@ public abstract class OkHttpCallback<T> implements Callback {
     public abstract void onResponseSuccess(T result);
 
     public abstract void onResponseError(Exception e);
+
+    /**
+     *
+     * @return
+     */
+    protected static Handler getMainHandler() {
+        return MainHandlerHolder.mainHandlerInstance;
+    }
+
+    private static class MainHandlerHolder {
+        private static final Handler mainHandlerInstance = new Handler(Looper.getMainLooper());
+    }
 
 }
