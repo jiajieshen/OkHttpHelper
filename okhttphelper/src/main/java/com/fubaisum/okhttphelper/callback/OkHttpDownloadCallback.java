@@ -1,5 +1,8 @@
 package com.fubaisum.okhttphelper.callback;
 
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
@@ -14,14 +17,6 @@ import java.io.InputStream;
  */
 public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
 
-    private String fileName;
-    private String destDirectory;
-
-    public OkHttpDownloadCallback(String fileName, String destDirectory) {
-        this.fileName = fileName;
-        this.destDirectory = destDirectory;
-    }
-
     @Override
     public void onFailure(Request request, IOException e) {
         sendFailureCallback(e);
@@ -33,12 +28,22 @@ public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
             sendFailureCallback(new RuntimeException(response.toString()));
             return;
         }
+
+        String fileName = getFileName();
+        if (TextUtils.isEmpty(fileName)) {
+            throw new IllegalArgumentException("The getFileName() can't be empty.");
+        }
+        String directory = getDirectory();
+        if (TextUtils.isEmpty(directory)) {
+            throw new IllegalArgumentException("The getDirectory() can't be empty.");
+        }
+
         InputStream inputStream = response.body().byteStream();
         byte[] buffer = new byte[2048];
         int readBytesCount;
         FileOutputStream fileOutputStream = null;
         try {
-            File file = new File(destDirectory, fileName);
+            File file = new File(getDirectory(), getFileName());
             fileOutputStream = new FileOutputStream(file);
             while ((readBytesCount = inputStream.read(buffer)) != -1) {
                 fileOutputStream.write(buffer, 0, readBytesCount);
@@ -61,4 +66,10 @@ public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
             }
         }
     }
+
+    @NonNull
+    protected abstract String getFileName();
+
+    @NonNull
+    protected abstract String getDirectory();
 }

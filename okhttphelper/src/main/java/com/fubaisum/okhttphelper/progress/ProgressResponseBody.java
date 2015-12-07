@@ -91,13 +91,14 @@ class ProgressResponseBody extends ResponseBody {
             public long read(Buffer sink, long byteCount) throws IOException {
                 //下次读取的字节数
                 long nextReadBytesCount = super.read(sink, byteCount);
-
                 //增加当前读取的字节数，如果读取完成了nextReadBytesCount会返回-1
                 totalReadBytesCount += nextReadBytesCount != -1 ? nextReadBytesCount : 0;
+
                 //可能的总字节数，如果contentLength()不知道长度，会返回-1
                 if (totalBytesCount == 0) {
                     totalBytesCount = contentLength();
                 }
+
                 progressListener.onProgress(totalReadBytesCount, totalBytesCount);
 
                 return nextReadBytesCount;

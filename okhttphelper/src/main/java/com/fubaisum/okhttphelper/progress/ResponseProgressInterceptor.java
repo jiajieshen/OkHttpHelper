@@ -21,8 +21,6 @@ class ResponseProgressInterceptor implements Interceptor {
         Response originalResponse = chain.proceed(chain.request());
         ProgressResponseBody progressResponseBody =
                 new ProgressResponseBody(originalResponse.body(), progressListener);
-        return originalResponse.newBuilder()
-                .body(progressResponseBody)
-                .build();
+        return originalResponse.newBuilder().body(progressResponseBody).build();
     }
 }

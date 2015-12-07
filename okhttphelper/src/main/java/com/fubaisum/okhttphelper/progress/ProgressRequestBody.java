@@ -86,10 +86,12 @@ class ProgressRequestBody extends RequestBody {
 
                 //增加当前写入的字节数
                 writtenBytesCount += byteCount;
+
                 //获得contentLength的值，后续不再调用
                 if (totalBytesCount == 0) {
                     totalBytesCount = contentLength();
                 }
+
                 progressListener.onProgress(writtenBytesCount, totalBytesCount);
             }
         };

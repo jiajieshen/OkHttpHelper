@@ -38,15 +38,16 @@ public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
     public void onResponse(Response response) throws IOException {
         if (!response.isSuccessful()) {
             sendFailureCallback(new RuntimeException(response.toString()));
-            return;
+        }else{
+            String responseStr = response.body().string();
+            if (modelType == String.class) {
+                sendSuccessCallback((T) responseStr);
+            } else {
+                T result = OkHttpManager.getGson().fromJson(responseStr, modelType);
+                sendSuccessCallback(result);
+            }
         }
-        String responseStr = response.body().string();
-        if (modelType == String.class) {
-            sendSuccessCallback((T) responseStr);
-        } else {
-            T result = OkHttpManager.getGson().fromJson(responseStr, modelType);
-            sendSuccessCallback(result);
-        }
+
     }
 
 }
