@@ -92,8 +92,18 @@ Model回调
 
 取消请求
 
-        okHttpRequest.cancel(tag);
+        okHttpRequest.cancel();
 
+全局配置
+
+        OkHttpClient okHttpClient = OkHttpClientHolder.getOkHttpClient();
+        // eg.
+        okHttpClient.networkInterceptors().add(new StethoInterceptor());
+        // eg.
+        okHttpClient.setConnectTimeout(10000, TimeUnit.SECONDS);
+
+PS：
+响应进度回调的实现，是采用克隆OkHttpClient单例，然后添加拦截器的方法；
 
 # 参考
 OkHttp使用教程
