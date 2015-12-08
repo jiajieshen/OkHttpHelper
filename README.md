@@ -103,7 +103,9 @@ Model回调
         okHttpClient.setConnectTimeout(10000, TimeUnit.SECONDS);
 
 PS：
-响应进度回调的实现，是采用克隆OkHttpClient单例，然后添加拦截器的方法；
+
+响应进度回调的实现，采用了克隆OkHttpClient单例，然后添加拦截器的方法；所以所有监听响应进度的请求，都会产生新的OkHttpClient实例，若要取消请求，都只能单独取消；不要通过获取全局的OkHttpClient来统一取消。
+
 
 # 参考
 OkHttp使用教程
