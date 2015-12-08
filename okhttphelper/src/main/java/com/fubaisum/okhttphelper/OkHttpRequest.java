@@ -89,7 +89,7 @@ public class OkHttpRequest {
                     requestBody =
                             OkHttpProgressHelper.wrappedRequestProgress(requestBody, requestProgressListener);
                 }
-                
+
                 if (headers == null) {
                     return new Request.Builder().tag(tag).url(url).post(requestBody).build();
                 } else {
@@ -103,9 +103,9 @@ public class OkHttpRequest {
     @NonNull
     private OkHttpClient getOkHttpClient() {
         if (responseProgressListener == null) {
-            return OkHttpClientSingleton.getOkHttpClient();
+            return OkHttpClientHolder.getOkHttpClient();
         } else {
-            OkHttpClient clone = OkHttpClientSingleton.getOkHttpClient().clone();
+            OkHttpClient clone = OkHttpClientHolder.getOkHttpClient().clone();
             Interceptor interceptor =
                     OkHttpProgressHelper.newResponseProgressInterceptor(responseProgressListener);
             clone.networkInterceptors().add(interceptor);
