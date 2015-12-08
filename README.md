@@ -10,6 +10,7 @@
                 .appendUrlParam(key, value)
                 .appendHeader(line)
                 .appendHeader(key, value)
+                .responseProgress(progressListener)
                 .build();
 
 构建Post请求
@@ -21,7 +22,24 @@
                 .appendHeader(line)
                 .appendHeader(key, value)
                 .post(okHttpParams)
+                .requestProgress(requestProgressListener)
+                .responseProgress(responseProgressListener)
                 .build();
+
+Post参数构建
+
+        //普通表单参数
+        OkHttpFormParams okHttpParams = new OkHttpFormParams();
+        okHttpParams.put(key,value);
+        
+        //多类型参数
+        OkHttpMultiTypeParams okHttpParams = new OkHttpMultiTypeParams();
+        okHttpParams.put(key,value);
+        okHttpParams.put(key,file);
+        okHttpParams.put(key,fileName,bytes);
+        
+        //Json参数
+        OkHttpJsonParams okHttpJsonParams = new OkHttpJsonParams(json);
 
 执行同步请求
 
@@ -39,19 +57,29 @@ Model回调
         new OkHttpModelCallBack<String>() {
             @Override
             public void onResponseSuccess(String result) {
-                
             }
 
             @Override
             public void onResponseError(Exception e) {
-
             }
         };
 
 下载文件回调
 
+        new OkHttpDownloadCallback(destDir, destFileName) {
 
+            @Override
+            public void onResponseSuccess(String fileAbsolutePath) {
+            }
 
+            @Override
+            public void onResponseError(Exception e) {
+            }
+        };
+
+取消请求
+
+        okHttpRequest.cancel(tag);
 
 
 # 参考
