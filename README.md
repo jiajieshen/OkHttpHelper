@@ -77,6 +77,19 @@ Model回调
             }
         };
 
+进度监听
+
+        new OkHttpUiProgressListener() {
+            @Override
+            protected void onUiProgress(long currentBytesCount, long totalBytesCount) {
+                if (totalBytesCount == -1) {
+                    // unknown progress
+                }else{
+                    float progress = currentBytesCount * 1.0f / totalBytesCount * 100;
+                }
+            }
+        };
+
 取消请求
 
         okHttpRequest.cancel(tag);
