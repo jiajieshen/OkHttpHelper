@@ -91,8 +91,11 @@ public class OkHttpRequest {
         executeAsynRequest(callback);
     }
 
-    public void cancel(Object tag) {
+    public void cancel() {
         if (null != okHttpClient) {
+            if (null == tag) {
+                throw new NullPointerException("The tag is null.");
+            }
             okHttpClient.cancel(tag);
         }
     }
