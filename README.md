@@ -2,77 +2,55 @@
 方便使用OkHttp的库
 
 # 用法事例
-Get请求
+构建Get请求
 
-        OkHttpRequest request = new OkHttpRequest.Builder()
+        OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
                 .tag(tag)
                 .url(url)
                 .appendUrlParam(key, value)
                 .appendHeader(line)
                 .appendHeader(key, value)
-                .responseProgress(new OkHttpProgressListener() {
-                    @Override
-                    public void onProgress(long currentBytesCount, long totalBytesCount) {
+                .build();
 
-                    }
-                })
-                .get();
+构建Post请求
 
-Post请求
-
-        OkHttpRequest request = new OkHttpRequest.Builder()
+        OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
                 .tag(tag)
                 .url(url)
                 .appendUrlParam(key, value)
                 .appendHeader(line)
                 .appendHeader(key, value)
-                .requestProgress(new OkHttpProgressListener() {
-                    @Override
-                    public void onProgress(long currentBytesCount, long totalBytesCount) {
-                        
-                    }
-                })
-                .responseProgress(new OkHttpProgressListener() {
-                    @Override
-                    public void onProgress(long currentBytesCount, long totalBytesCount) {
+                .post(okHttpParams)
+                .build();
 
-                    }
-                })
-                .post();
+执行同步请求
 
-同步响应（三选一）
+        InputStream inputStream = okHttpRequest.requestByteStream();
+        String string = okHttpRequest.requestString();
+        User model = okHttpRequest.requestModel(User.class);
 
-        InputStream inputStream = request.byteStream();
-        String string = request.string();
-        User user = request.model(User.class);
+执行异步请求
 
-异步响应（分ui/worker回调）
+        okHttpRequest.requestUiCallback(okHttpCallback);//Ui线程回调
+        okHttpRequest.requestWorkerCallback(okHttpCallback);//后台线程回调
 
-        request.uiCallback(new OkHttpModelCallBack<String>() {
+Model回调
+
+        new OkHttpModelCallBack<String>() {
             @Override
             public void onResponseSuccess(String result) {
-                //可直接更新UI
+                
             }
 
             @Override
             public void onResponseError(Exception e) {
-                //可直接更新UI
-            }
-        });
 
-        request.workerCallback(new OkHttpModelCallBack<String>() {
-            @Override
-            public void onResponseSuccess(String result) {
-                //不可直接更新UI
             }
+        };
 
-            @Override
-            public void onResponseError(Exception e) {
-                //不可直接更新UI
-            }
-        });
+下载文件回调
 
-下载
+
 
 
 
