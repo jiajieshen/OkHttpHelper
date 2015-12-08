@@ -1,7 +1,7 @@
 # OkHttpHelper
-方便使用OkHttp的库
+方便使用OkHttp的库，okhttp见：https://github.com/square/okhttp
 
-# 用法事例
+# 用法示例
 构建Get请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
@@ -102,5 +102,5 @@ http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0106/2275.html
 OkHttp上传下载进度监听
 https://github.com/lizhangqu/CoreProgress.git
 
-OkHttp简单封装
+okhttp的辅助类
 https://github.com/hongyangAndroid/okhttp-utils.git
