@@ -4,8 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
+import com.facebook.stetho.common.LogUtil;
 import com.fubaisum.okhttphelper.OkHttpRequest;
-import com.fubaisum.okhttphelper.callback.OkHttpModelCallBack;
+import com.fubaisum.okhttphelper.callback.OkHttpDownloadCallback;
 import com.fubaisum.okhttphelper.progress.OkHttpUiProgressListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onUiProgress(long currentBytesCount, long totalBytesCount) {
                         if (totalBytesCount == -1) {
-                            tvTest.setText("totalBytesCount is unknow.");
+                            tvTest.setText("totalBytesCount is unknown.");
                         } else {
                             float progress = currentBytesCount * 1.0f / totalBytesCount * 100;
                             tvTest.setText("progress = " + progress);
@@ -33,15 +34,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build()
-                .requestUiCallback(new OkHttpModelCallBack<String>() {
+                .requestUiCallback(new OkHttpDownloadCallback(getExternalCacheDir().getAbsolutePath(), "test.png") {
                     @Override
-                    public void onResponseSuccess(String result) {
-
+                    public void onResponseSuccess(String fileAbsolutePath) {
+                        LogUtil.e("fileAbsolutePath = " + fileAbsolutePath);
                     }
 
                     @Override
                     public void onResponseError(Exception e) {
-
+                        LogUtil.e("download onResponseError() : " + e);
                     }
                 });
     }

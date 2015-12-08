@@ -17,6 +17,21 @@ import java.io.InputStream;
  */
 public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
 
+    private String destDirectory;
+    private String destFileName;
+
+    public OkHttpDownloadCallback(@NonNull String destDirectory, @NonNull String destFileName) {
+        this.destDirectory = destDirectory;
+        this.destFileName = destFileName;
+
+        if (TextUtils.isEmpty(destDirectory)) {
+            throw new IllegalArgumentException("The destDirectory can't be empty.");
+        }
+        if (TextUtils.isEmpty(destFileName)) {
+            throw new IllegalArgumentException("The destFileName can't be empty.");
+        }
+    }
+
     @Override
     public void onFailure(Request request, IOException e) {
         sendFailureCallback(e);
@@ -29,21 +44,12 @@ public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
             return;
         }
 
-        String fileName = getFileName();
-        if (TextUtils.isEmpty(fileName)) {
-            throw new IllegalArgumentException("The getFileName() can't be empty.");
-        }
-        String directory = getDirectory();
-        if (TextUtils.isEmpty(directory)) {
-            throw new IllegalArgumentException("The getDirectory() can't be empty.");
-        }
-
         InputStream inputStream = response.body().byteStream();
         byte[] buffer = new byte[2048];
         int readBytesCount;
         FileOutputStream fileOutputStream = null;
         try {
-            File file = new File(directory, fileName);
+            File file = new File(destDirectory, destFileName);
             fileOutputStream = new FileOutputStream(file);
             while ((readBytesCount = inputStream.read(buffer)) != -1) {
                 fileOutputStream.write(buffer, 0, readBytesCount);
@@ -67,9 +73,5 @@ public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
         }
     }
 
-    @NonNull
-    protected abstract String getFileName();
-
-    @NonNull
-    protected abstract String getDirectory();
+    public abstract void onResponseSuccess(String fileAbsolutePath);
 }
