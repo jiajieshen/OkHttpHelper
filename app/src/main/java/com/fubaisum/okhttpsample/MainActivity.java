@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .get()
-                .uiCallback(new OkHttpModelCallBack<String>() {
+                .build()
+                .requestUiCallback(new OkHttpModelCallBack<String>() {
                     @Override
                     public void onResponseSuccess(String result) {
 
@@ -44,64 +44,5 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
-
-//        new OkHttpRequest.Builder()
-//                .tag(tag)
-//                .url(url)
-//                .appendUrlParam(key, value)
-//                .appendHeader(line)
-//                .appendHeader(key, value)
-//                .responseProgress(progressListener)
-//                .get();
-//
-//        InputStream inputStream = request.byteStream();
-//        String string = request.string();
-//        User user = request.model(User.class);
-//
-//        OkHttpRequest request = new OkHttpRequest.Builder()
-//                .tag(tag)
-//                .url(url)
-//                .appendUrlParam(key, value)
-//                .appendHeader(line)
-//                .appendHeader(key, value)
-//                .requestProgress(progressListener)
-//                .responseProgress(progressListener)
-//                .post();
-//
-//        new OkHttpDownloadCallback() {
-//            @NonNull
-//            @Override
-//            protected String getFileName() {
-//                return null;
-//            }
-//
-//            @NonNull
-//            @Override
-//            protected String getDirectory() {
-//                return null;
-//            }
-//
-//            @Override
-//            public void onResponseSuccess(String fileAbsolutePath) {
-//
-//            }
-//
-//            @Override
-//            public void onResponseError(Exception e) {
-//
-//            }
-//        };
-//
-//        request.workerCallback(new OkHttpModelCallBack<String>() {
-//            @Override
-//            public void onResponseSuccess(String result) {
-//                //不可直接更新UI
-//            }
-//
-//            @Override
-//            public void onResponseError(Exception e) {
-//                //不可直接更新UI
-//            }
-//        });
     }
 }
