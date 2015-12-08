@@ -28,10 +28,16 @@ public abstract class OkHttpUiProgressListener implements OkHttpProgressListener
             startTimeMillis = System.currentTimeMillis();
             progressPeriod = getUiProgressPeriod();
         } else if (currentBytesCount == totalBytesCount) {
+            /**
+             * 请求/响应结束时，必须回调进度
+             */
             this.currentBytesCount = currentBytesCount;
             this.totalBytesCount = totalBytesCount;
             uiHandler.sendEmptyMessage(MSG_UI_PROGRESS);
         } else {
+            /**
+             * 请求/响应过程中，至少延迟指定的周期，才回调进度
+             */
             long crrTimeMillis = System.currentTimeMillis();
             if (crrTimeMillis - startTimeMillis >= progressPeriod) {
                 startTimeMillis = crrTimeMillis;

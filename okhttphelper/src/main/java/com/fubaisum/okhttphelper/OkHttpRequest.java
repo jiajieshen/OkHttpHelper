@@ -1,7 +1,6 @@
 package com.fubaisum.okhttphelper;
 
 import android.os.Build;
-import android.support.annotation.CheckResult;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
@@ -48,18 +47,54 @@ public class OkHttpRequest {
     private OkHttpRequest(Object tag,
                           String url,
                           Headers headers,
-                          OkHttpProgressListener requestProgressListener,
+                          OkHttpParams params, OkHttpProgressListener requestProgressListener,
                           OkHttpProgressListener responseProgressListener) {
         this.tag = tag;
         this.url = url;
         this.headers = headers;
+        this.params = params;
         this.requestProgressListener = requestProgressListener;
         this.responseProgressListener = responseProgressListener;
+
+        if (null != params) {
+            this.requestMethod = METHOD_POST;
+        }
     }
 
-    private void postParams(OkHttpParams params) {
-        this.requestMethod = METHOD_POST;
-        this.params = params;
+    public InputStream requestByteStream() throws IOException {
+        Response response = executeSyncRequest();
+        return response.body().byteStream();
+    }
+
+    public String requestString() throws IOException {
+        Response response = executeSyncRequest();
+        return response.body().string();
+    }
+
+    public <T> T requestModel(Class<T> tClass) throws IOException {
+        Response response = executeSyncRequest();
+        String responseStr = response.body().string();
+        if (tClass == String.class) {
+            return (T) responseStr;
+        } else {
+            return getGson().fromJson(responseStr, tClass);
+        }
+    }
+
+    public <T> void requestUiCallback(@NonNull OkHttpCallback<T> callback) {
+        callback.setCallbackMode(OkHttpCallback.UI);
+        executeAsynRequest(callback);
+    }
+
+    public <T> void requestWorkerCallback(@NonNull OkHttpCallback<T> callback) {
+        callback.setCallbackMode(OkHttpCallback.WORKER);
+        executeAsynRequest(callback);
+    }
+
+    public void cancel(Object tag) {
+        if (null != okHttpClient) {
+            okHttpClient.cancel(tag);
+        }
     }
 
     private Response executeSyncRequest() throws IOException {
@@ -77,7 +112,7 @@ public class OkHttpRequest {
     private Request buildRequest() {
         switch (requestMethod) {
             case METHOD_GET: {
-                if (headers == null) {
+                if (null == headers) {
                     return new Request.Builder().tag(tag).url(url).build();
                 } else {
                     return new Request.Builder().tag(tag).url(url).headers(headers).build();
@@ -85,7 +120,7 @@ public class OkHttpRequest {
             }
             case METHOD_POST: {
                 RequestBody requestBody = params.buildRequestBody();
-                if (requestProgressListener != null) {
+                if (null != requestProgressListener) {
                     requestBody =
                             OkHttpProgressHelper.wrappedRequestProgress(requestBody, requestProgressListener);
                 }
@@ -102,7 +137,7 @@ public class OkHttpRequest {
 
     @NonNull
     private OkHttpClient getOkHttpClient() {
-        if (responseProgressListener == null) {
+        if (null == responseProgressListener) {
             return OkHttpClientHolder.getOkHttpClient();
         } else {
             OkHttpClient clone = OkHttpClientHolder.getOkHttpClient().clone();
@@ -110,42 +145,6 @@ public class OkHttpRequest {
                     OkHttpProgressHelper.newResponseProgressInterceptor(responseProgressListener);
             clone.networkInterceptors().add(interceptor);
             return clone;
-        }
-    }
-
-    public InputStream byteStream() throws IOException {
-        Response response = executeSyncRequest();
-        return response.body().byteStream();
-    }
-
-    public String string() throws IOException {
-        Response response = executeSyncRequest();
-        return response.body().string();
-    }
-
-    public <T> T model(Class<T> tClass) throws IOException {
-        Response response = executeSyncRequest();
-        String responseStr = response.body().string();
-        if (tClass == String.class) {
-            return (T) responseStr;
-        } else {
-            return getGson().fromJson(responseStr, tClass);
-        }
-    }
-
-    public <T> void uiCallback(@NonNull OkHttpCallback<T> callback) {
-        callback.setCallbackMode(OkHttpCallback.UI);
-        executeAsynRequest(callback);
-    }
-
-    public <T> void workerCallback(@NonNull OkHttpCallback<T> callback) {
-        callback.setCallbackMode(OkHttpCallback.WORKER);
-        executeAsynRequest(callback);
-    }
-
-    public void cancel(Object tag) {
-        if (okHttpClient != null) {
-            okHttpClient.cancel(tag);
         }
     }
 
@@ -178,6 +177,7 @@ public class OkHttpRequest {
         private StringBuilder urlBuilder = new StringBuilder();
         private Headers headers;
         private Headers.Builder headersBuilder;
+        private OkHttpParams params;
         private OkHttpProgressListener requestProgressListener;
         private OkHttpProgressListener responseProgressListener;
 
@@ -213,6 +213,11 @@ public class OkHttpRequest {
             return this;
         }
 
+        public Builder post(OkHttpParams params) {
+            this.params = params;
+            return this;
+        }
+
         public Builder requestProgress(OkHttpProgressListener progressListener) {
             this.requestProgressListener = progressListener;
             return this;
@@ -223,26 +228,13 @@ public class OkHttpRequest {
             return this;
         }
 
-        @CheckResult
-        public OkHttpRequest get() {
-            build();
-            return new OkHttpRequest(tag, url, headers, requestProgressListener, responseProgressListener);
-        }
 
-        @CheckResult
-        public OkHttpRequest post(@NonNull OkHttpParams params) {
-            build();
-            OkHttpRequest request =
-                    new OkHttpRequest(tag, url, headers, requestProgressListener, responseProgressListener);
-            request.postParams(params);
-            return request;
-        }
-
-        private void build() {
+        public OkHttpRequest build() {
             url = urlBuilder.deleteCharAt(urlBuilder.length() - 1).toString();
             if (headersBuilder != null) {
                 headers = headersBuilder.build();
             }
+            return new OkHttpRequest(tag, url, headers, params, requestProgressListener, responseProgressListener);
         }
     }
 }
