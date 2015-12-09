@@ -110,5 +110,5 @@ http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0106/2275.html
 OkHttp上传下载进度监听
 https://github.com/lizhangqu/CoreProgress.git
 
-okhttp的辅助类
+OkHttp的辅助类
 https://github.com/hongyangAndroid/okhttp-utils.git
