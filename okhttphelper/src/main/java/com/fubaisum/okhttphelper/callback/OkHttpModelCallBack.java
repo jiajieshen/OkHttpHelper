@@ -54,16 +54,21 @@ public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
     }
 
     @Override
-    public void onResponse(Response response) throws IOException {
+    public void onResponse(Response response) {
         if (!response.isSuccessful()) {
             sendFailureCallback(new RuntimeException(response.toString()));
         } else {
-            String responseStr = response.body().string();
-            if (modelType == String.class) {
-                sendSuccessCallback((T) responseStr);
-            } else {
-                T result = gson.fromJson(responseStr, modelType);
-                sendSuccessCallback(result);
+            try {
+                String responseStr = response.body().string();
+                if (modelType == String.class) {
+                    sendSuccessCallback((T) responseStr);
+                } else {
+                    T result = gson.fromJson(responseStr, modelType);
+                    sendSuccessCallback(result);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                sendFailureCallback(e);
             }
         }
     }
