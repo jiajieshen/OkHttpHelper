@@ -1,6 +1,5 @@
 package com.fubaisum.okhttphelper;
 
-import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
@@ -9,7 +8,7 @@ import com.fubaisum.okhttphelper.params.OkHttpParams;
 import com.fubaisum.okhttphelper.progress.OkHttpProgressHelper;
 import com.fubaisum.okhttphelper.progress.OkHttpProgressListener;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
@@ -19,7 +18,6 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Modifier;
 
 /**
  * Created by sum on 15-12-5.
@@ -61,32 +59,30 @@ public class OkHttpRequest {
         }
     }
 
-    public InputStream requestByteStream() throws IOException {
+    public InputStream byteStream() throws Exception {
         Response response = executeSyncRequest();
         return response.body().byteStream();
     }
 
-    public String requestString() throws IOException {
+    public String string() throws Exception {
         Response response = executeSyncRequest();
         return response.body().string();
     }
 
-    public <T> T requestModel(Class<T> tClass) throws IOException {
+    public <T> T model() throws Exception {
         Response response = executeSyncRequest();
         String responseStr = response.body().string();
-        if (tClass == String.class) {
-            return (T) responseStr;
-        } else {
-            return getGson().fromJson(responseStr, tClass);
-        }
+        Gson gson = GsonHolder.getGson();
+        return gson.fromJson(responseStr, new TypeToken<T>() {
+        }.getType());
     }
 
-    public <T> void requestUiCallback(@NonNull OkHttpCallback<T> callback) {
+    public <T> void uiCallback(@NonNull OkHttpCallback<T> callback) {
         callback.setCallbackMode(OkHttpCallback.UI);
         executeAsynRequest(callback);
     }
 
-    public <T> void requestWorkerCallback(@NonNull OkHttpCallback<T> callback) {
+    public <T> void workerCallback(@NonNull OkHttpCallback<T> callback) {
         callback.setCallbackMode(OkHttpCallback.WORKER);
         executeAsynRequest(callback);
     }
@@ -94,7 +90,7 @@ public class OkHttpRequest {
     public void cancel() {
         if (null != okHttpClient) {
             if (null == tag) {
-                throw new NullPointerException("The tag is null.");
+                throw new NullPointerException("The request tag is null.");
             }
             okHttpClient.cancel(tag);
         }
@@ -148,28 +144,6 @@ public class OkHttpRequest {
                     OkHttpProgressHelper.newResponseProgressInterceptor(responseProgressListener);
             clone.networkInterceptors().add(interceptor);
             return clone;
-        }
-    }
-
-    private static Gson getGson() {
-        return GsonHolder.gson;
-    }
-
-    private static class GsonHolder {
-        private static final Gson gson;
-
-        static {
-            final int sdk = Build.VERSION.SDK_INT;
-            if (sdk >= Build.VERSION_CODES.M) {
-                GsonBuilder gsonBuilder = new GsonBuilder()
-                        .excludeFieldsWithModifiers(
-                                Modifier.FINAL,
-                                Modifier.TRANSIENT,
-                                Modifier.STATIC);
-                gson = gsonBuilder.create();
-            } else {
-                gson = new Gson();
-            }
         }
     }
 

@@ -67,7 +67,6 @@ public abstract class OkHttpCallback<T> implements Callback {
 
     /**
      *
-     * @return
      */
     protected static Handler getMainHandler() {
         return MainHandlerHolder.mainHandlerInstance;

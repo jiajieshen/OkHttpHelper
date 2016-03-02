@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build()
-                .requestUiCallback(new OkHttpDownloadCallback(getExternalCacheDir().getAbsolutePath(), "test.png") {
+                .uiCallback(new OkHttpDownloadCallback(getExternalCacheDir().getAbsolutePath(), "test.png") {
                     @Override
                     public void onResponseSuccess(String fileAbsolutePath) {
                         LogUtil.e("fileAbsolutePath = " + fileAbsolutePath);

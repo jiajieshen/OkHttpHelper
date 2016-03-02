@@ -1,15 +1,12 @@
 package com.fubaisum.okhttphelper.callback;
 
-import android.os.Build;
-
+import com.fubaisum.okhttphelper.GsonHolder;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.internal.$Gson$Types;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -18,22 +15,7 @@ import java.lang.reflect.Type;
  */
 public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
 
-    private static final Gson gson;
     private Type modelType;
-
-    static {
-        final int sdk = Build.VERSION.SDK_INT;
-        if (sdk >= Build.VERSION_CODES.M) {
-            GsonBuilder gsonBuilder = new GsonBuilder()
-                    .excludeFieldsWithModifiers(
-                            Modifier.FINAL,
-                            Modifier.TRANSIENT,
-                            Modifier.STATIC);
-            gson = gsonBuilder.create();
-        } else {
-            gson = new Gson();
-        }
-    }
 
     public OkHttpModelCallBack() {
         modelType = getSuperclassTypeParameter(getClass());
@@ -44,8 +26,8 @@ public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
         if (superclass instanceof Class) {
             throw new RuntimeException("Missing type parameter.");
         }
-        ParameterizedType parameterized = (ParameterizedType) superclass;
-        return $Gson$Types.canonicalize(parameterized.getActualTypeArguments()[0]);
+        ParameterizedType parameterizedType = (ParameterizedType) superclass;
+        return $Gson$Types.canonicalize(parameterizedType.getActualTypeArguments()[0]);
     }
 
     @Override
@@ -63,11 +45,11 @@ public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
                 if (modelType == String.class) {
                     sendSuccessCallback((T) responseStr);
                 } else {
+                    Gson gson = GsonHolder.getGson();
                     T result = gson.fromJson(responseStr, modelType);
                     sendSuccessCallback(result);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
                 sendFailureCallback(e);
             }
         }
