@@ -66,7 +66,7 @@ Model回调
 
 下载文件回调
 
-        new OkHttpDownloadCallback(destDir, destFileName) {
+        new OkHttpDownloadCallback(destFile) {
 
             @Override
             public void onResponseSuccess(String fileAbsolutePath) {
