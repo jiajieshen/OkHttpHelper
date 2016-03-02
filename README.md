@@ -43,14 +43,14 @@ Post参数构建
 
 执行同步请求
 
-        InputStream inputStream = okHttpRequest.requestByteStream();
-        String string = okHttpRequest.requestString();
-        User model = okHttpRequest.requestModel(User.class);
+        InputStream inputStream = okHttpRequest.byteStream();
+        String string = okHttpRequest.string();
+        User model = okHttpRequest.model();
 
 执行异步请求
 
-        okHttpRequest.requestUiCallback(okHttpCallback);//Ui线程回调
-        okHttpRequest.requestWorkerCallback(okHttpCallback);//后台线程回调
+        okHttpRequest.uiCallback(okHttpCallback);//Ui线程回调
+        okHttpRequest.workerCallback(okHttpCallback);//工作线程回调
 
 Model回调
 
