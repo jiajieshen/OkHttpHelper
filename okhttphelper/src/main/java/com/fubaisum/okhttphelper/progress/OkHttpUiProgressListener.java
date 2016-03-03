@@ -60,7 +60,7 @@ public abstract class OkHttpUiProgressListener implements OkHttpProgressListener
 
         private UiHandler(OkHttpUiProgressListener uiProgressListener) {
             super(Looper.getMainLooper());
-            weakReference = new WeakReference<OkHttpUiProgressListener>(uiProgressListener);
+            weakReference = new WeakReference<>(uiProgressListener);
         }
 
         @Override

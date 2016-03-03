@@ -10,7 +10,7 @@ public class OkHttpClientHolder {
     private static OkHttpClient okHttpClient = new OkHttpClient();
 
     private OkHttpClientHolder() {
-        throw new UnsupportedOperationException("OkHttpClientHolder cannot be initialize.");
+        throw new UnsupportedOperationException("OkHttpClientHolder cannot be initialized.");
     }
 
     public static OkHttpClient getOkHttpClient() {
