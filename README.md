@@ -1,7 +1,21 @@
 # OkHttpHelper
 方便使用OkHttp的库，okhttp见：https://github.com/square/okhttp
 
-# 用法示例
+## 在module的build.gradle添加依赖
+<pre><code>
+repositories {
+    maven {
+        url 'https://dl.bintray.com/fubaisum/maven/'
+    }
+}
+
+dependencies {
+    compile 'com.scausum.okhttphelper:okhttphelper:1.0.0'
+}
+
+</code></pre>
+
+## 用法示例
 构建Get请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
