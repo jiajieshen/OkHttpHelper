@@ -10,6 +10,7 @@ import java.io.InputStream;
 
 import okhttp3.Call;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * PS：如果下载文件成功，返回参数为文件的绝对路径
@@ -33,11 +34,13 @@ public abstract class DownloadCallback extends Callback<String> {
         if (!response.isSuccessful()) {
             sendFailureCallback(new NetworkErrorException(response.toString()));
         } else {
-            InputStream inputStream = response.body().byteStream();
+            ResponseBody responseBody = response.body();
+            InputStream inputStream = null;
+            FileOutputStream fileOutputStream = null;
             byte[] buffer = new byte[2048];
             int readBytesCount;
-            FileOutputStream fileOutputStream = null;
             try {
+                inputStream = responseBody.byteStream();
                 fileOutputStream = new FileOutputStream(destFile);
                 while ((readBytesCount = inputStream.read(buffer)) != -1) {
                     fileOutputStream.write(buffer, 0, readBytesCount);
@@ -48,15 +51,22 @@ public abstract class DownloadCallback extends Callback<String> {
             } catch (IOException e) {
                 sendFailureCallback(e);
             } finally {
-                try {
-                    if (null != inputStream) inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                // 关闭responseBody
+                responseBody.close();
+                // 关闭输入输出流
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                try {
-                    if (null != fileOutputStream) fileOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (fileOutputStream != null) {
+                    try {
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }

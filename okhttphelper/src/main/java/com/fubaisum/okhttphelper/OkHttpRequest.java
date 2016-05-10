@@ -1,5 +1,6 @@
 package com.fubaisum.okhttphelper;
 
+import android.accounts.NetworkErrorException;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
@@ -20,6 +21,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Created by sum on 15-12-5.
@@ -63,20 +65,47 @@ public class OkHttpRequest {
 
     public InputStream byteStream() throws Exception {
         Response response = executeSyncRequest();
-        return response.body().byteStream();
+        if (response.isSuccessful()) {
+            ResponseBody responseBody = response.body();
+            try {
+                return responseBody.byteStream();
+            } finally {
+                responseBody.close();
+            }
+        } else {
+            throw new NetworkErrorException(response.toString());
+        }
     }
 
     public String string() throws Exception {
         Response response = executeSyncRequest();
-        return response.body().string();
+        if (response.isSuccessful()) {
+            ResponseBody responseBody = response.body();
+            try {
+                return responseBody.string();
+            } finally {
+                responseBody.close();
+            }
+        } else {
+            throw new NetworkErrorException(response.toString());
+        }
     }
 
     public <T> T model() throws Exception {
         Response response = executeSyncRequest();
-        String responseStr = response.body().string();
-        Gson gson = GsonHolder.getGson();
-        return gson.fromJson(responseStr, new TypeToken<T>() {
-        }.getType());
+        if (response.isSuccessful()) {
+            ResponseBody responseBody = response.body();
+            try {
+                String responseStr = responseBody.string();
+                Gson gson = GsonHolder.getGson();
+                return gson.fromJson(responseStr, new TypeToken<T>() {
+                }.getType());
+            } finally {
+                responseBody.close();
+            }
+        } else {
+            throw new NetworkErrorException(response.toString());
+        }
     }
 
 

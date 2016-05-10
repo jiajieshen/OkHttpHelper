@@ -4,6 +4,7 @@ import android.accounts.NetworkErrorException;
 
 import com.fubaisum.okhttphelper.GsonHolder;
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.internal.$Gson$Types;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.lang.reflect.Type;
 
 import okhttp3.Call;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Created by sum on 15-12-3.
@@ -43,8 +45,9 @@ public abstract class ModelCallBack<T> extends Callback<T> {
         if (!response.isSuccessful()) {
             sendFailureCallback(new NetworkErrorException(response.toString()));
         } else {
+            ResponseBody responseBody = response.body();
             try {
-                String responseStr = response.body().string();
+                String responseStr = responseBody.string();
                 if (modelType == String.class) {
                     sendSuccessCallback((T) responseStr);
                 } else {
@@ -52,10 +55,10 @@ public abstract class ModelCallBack<T> extends Callback<T> {
                     T result = gson.fromJson(responseStr, modelType);
                     sendSuccessCallback(result);
                 }
-            } catch (Exception e) {
+            } catch (JsonParseException e) {
                 sendFailureCallback(e);
             }finally {
-                response.body().close();
+                responseBody.close();
             }
         }
     }
