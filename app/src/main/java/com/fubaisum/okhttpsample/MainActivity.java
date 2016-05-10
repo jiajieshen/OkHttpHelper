@@ -2,12 +2,17 @@ package com.fubaisum.okhttpsample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 
-import com.facebook.stetho.common.LogUtil;
 import com.fubaisum.okhttphelper.OkHttpRequest;
+import com.fubaisum.okhttphelper.ThreadMode;
 import com.fubaisum.okhttphelper.callback.DownloadCallback;
+import com.fubaisum.okhttphelper.callback.ModelCallBack;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
+import com.scausum.okhttphelper.converter.gson.GsonConverterFactory;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,6 +25,46 @@ public class MainActivity extends AppCompatActivity {
 
         tvTest = (TextView) findViewById(R.id.tv_test);
 
+        testParseModel();
+    }
+
+    private void testParseModel() {
+        OkHttpRequest.setConverterFactory(GsonConverterFactory.create());
+        new OkHttpRequest.Builder()
+                .url("http://fubaisum.github.io/testUser")
+                .build()
+                .threadMode(ThreadMode.MAIN)
+                .callback(new ModelCallBack<User>() {
+
+                    @Override
+                    public void onResponseSuccess(User user) {
+                        Log.e("MainActivity", "async success = " + user);
+                    }
+
+                    @Override
+                    public void onResponseFailure(Exception e) {
+                        Log.e("MainActivity", "async error = " + e);
+                    }
+                });
+
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    User user = new OkHttpRequest.Builder().url("http://fubaisum.github.io/testUser")
+                            .build().model(User.class);
+                    Log.e("MainActivity", "sync success = " + user);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("MainActivity", "sync error = " + e);
+                }
+            }
+        }.start();
+    }
+
+    private void testDownload() {
+        File file = new File(getCacheDir().getAbsolutePath(), "test.png");
         new OkHttpRequest.Builder()
                 .url("http://pic41.nipic.com/20140430/18021738_213628575106_2.jpg")
                 .responseProgress(new UiProgressListener() {
@@ -34,15 +79,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build()
-                .uiCallback(new DownloadCallback(getExternalCacheDir().getAbsolutePath(), "test.png") {
+                .callback(new DownloadCallback(file) {
                     @Override
                     public void onResponseSuccess(String fileAbsolutePath) {
-                        LogUtil.e("fileAbsolutePath = " + fileAbsolutePath);
+                        Log.e("MainActivity", "fileAbsolutePath = " + fileAbsolutePath);
                     }
 
                     @Override
-                    public void onResponseError(Exception e) {
-                        LogUtil.e("download onResponseFailure() : " + e);
+                    public void onResponseFailure(Exception e) {
+                        Log.e("MainActivity", "download onResponseFailure() : " + e);
                     }
                 });
     }

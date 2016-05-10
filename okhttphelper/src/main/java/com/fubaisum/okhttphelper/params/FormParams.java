@@ -1,7 +1,5 @@
 package com.fubaisum.okhttphelper.params;
 
-import android.support.annotation.NonNull;
-
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 
@@ -21,7 +19,6 @@ public class FormParams implements Params {
         formBodyBuilder.add(key, value);
     }
 
-    @NonNull
     public RequestBody buildRequestBody() {
         return formBodyBuilder.build();
     }

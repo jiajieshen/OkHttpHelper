@@ -1,15 +1,11 @@
 package com.fubaisum.okhttphelper;
 
 import android.accounts.NetworkErrorException;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
 
 import com.fubaisum.okhttphelper.callback.Callback;
 import com.fubaisum.okhttphelper.params.Params;
 import com.fubaisum.okhttphelper.progress.ProgressHelper;
 import com.fubaisum.okhttphelper.progress.ProgressListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,14 +24,10 @@ import okhttp3.ResponseBody;
  */
 public class OkHttpRequest {
 
+
     private static final int METHOD_GET = 0;
     private static final int METHOD_POST = 1;
 
-    @IntDef({METHOD_GET, METHOD_POST})
-    private @interface RequestMethod {
-    }
-
-    @RequestMethod
     private int requestMethod = METHOD_GET;
     private String url;
     private Headers headers;
@@ -61,6 +53,13 @@ public class OkHttpRequest {
         if (null != params) {
             this.requestMethod = METHOD_POST;
         }
+    }
+
+    /**
+     * 给Model解析器设置ConverterFactory
+     */
+    public static void setConverterFactory(Converter.Factory converterFactory) {
+        ModelParser.setConverterFactory(converterFactory);
     }
 
     public InputStream byteStream() throws Exception {
@@ -91,15 +90,18 @@ public class OkHttpRequest {
         }
     }
 
-    public <T> T model() throws Exception {
+    public <T> T model(Class<T> tClass) throws Exception {
         Response response = executeSyncRequest();
         if (response.isSuccessful()) {
             ResponseBody responseBody = response.body();
             try {
-                String responseStr = responseBody.string();
-                Gson gson = GsonHolder.getGson();
-                return gson.fromJson(responseStr, new TypeToken<T>() {
-                }.getType());
+                ModelParser<T> modelParser = new ModelParser<>();
+                if (tClass == String.class) {
+                    //noinspection unchecked
+                    return (T) responseBody.string();
+                } else {
+                    return modelParser.parseResponse(responseBody,tClass);
+                }
             } finally {
                 responseBody.close();
             }
@@ -109,12 +111,14 @@ public class OkHttpRequest {
     }
 
 
+
+
     public OkHttpRequest threadMode(ThreadMode threadMode) {
         this.threadMode = threadMode;
         return this;
     }
 
-    public <T> void callback(@NonNull Callback<T> callback) {
+    public <T> void callback(Callback<T> callback) {
         executeAsynRequest(callback);
     }
 
@@ -158,16 +162,18 @@ public class OkHttpRequest {
         throw new IllegalStateException("The requestMethod only can be METHOD_GET or METHOD_POST.");
     }
 
-    @NonNull
     private OkHttpClient getOkHttpClient() {
         if (responseProgressListener == null) {
             return OkHttpClientHolder.getOkHttpClient();
         } else {
             OkHttpClient okHttpClient = OkHttpClientHolder.getOkHttpClient();
-            OkHttpClient clone = okHttpClient.newBuilder().build();
             Interceptor interceptor =
                     ProgressHelper.newResponseProgressInterceptor(responseProgressListener);
-            clone.networkInterceptors().add(interceptor);
+
+            OkHttpClient clone = okHttpClient.newBuilder()
+                    .addNetworkInterceptor(interceptor)
+                    .build();
+
             return clone;
         }
     }

@@ -1,7 +1,5 @@
 package com.fubaisum.okhttphelper.params;
 
-import android.support.annotation.NonNull;
-
 import java.io.File;
 
 import okhttp3.MediaType;
@@ -37,7 +35,6 @@ public class MultipartParams implements Params {
         multipartBuilder.addFormDataPart(key, fileName, fileRequestBody);
     }
 
-    @NonNull
     @Override
     public RequestBody buildRequestBody() {
         return multipartBuilder.build();

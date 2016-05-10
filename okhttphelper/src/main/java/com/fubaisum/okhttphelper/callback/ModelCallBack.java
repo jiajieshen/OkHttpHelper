@@ -2,10 +2,7 @@ package com.fubaisum.okhttphelper.callback;
 
 import android.accounts.NetworkErrorException;
 
-import com.fubaisum.okhttphelper.GsonHolder;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.internal.$Gson$Types;
+import com.fubaisum.okhttphelper.ModelParser;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -21,18 +18,20 @@ import okhttp3.ResponseBody;
 public abstract class ModelCallBack<T> extends Callback<T> {
 
     private Type modelType;
+    private ModelParser<T> modelParser;
 
     public ModelCallBack() {
-        modelType = getSuperclassTypeParameter(getClass());
+        modelType = getGenericTypeParameter(getClass());
+        modelParser = new ModelParser<T>();
     }
 
-    private static Type getSuperclassTypeParameter(Class<?> subclass) {
-        Type superclass = subclass.getGenericSuperclass();
+    private static Type getGenericTypeParameter(Class<?> thisClass) {
+        Type superclass = thisClass.getGenericSuperclass();
         if (superclass instanceof Class) {
-            throw new RuntimeException("Missing type parameter.");
+            throw new RuntimeException("Missing modelType parameter.");
         }
         ParameterizedType parameterizedType = (ParameterizedType) superclass;
-        return $Gson$Types.canonicalize(parameterizedType.getActualTypeArguments()[0]);
+        return parameterizedType.getActualTypeArguments()[0];
     }
 
     @Override
@@ -47,17 +46,16 @@ public abstract class ModelCallBack<T> extends Callback<T> {
         } else {
             ResponseBody responseBody = response.body();
             try {
-                String responseStr = responseBody.string();
                 if (modelType == String.class) {
-                    sendSuccessCallback((T) responseStr);
+                    //noinspection unchecked
+                    sendSuccessCallback((T) responseBody.string());
                 } else {
-                    Gson gson = GsonHolder.getGson();
-                    T result = gson.fromJson(responseStr, modelType);
+                    T result = modelParser.parseResponse(responseBody,modelType);
                     sendSuccessCallback(result);
                 }
-            } catch (JsonParseException e) {
+            } catch (Exception e) {
                 sendFailureCallback(e);
-            }finally {
+            } finally {
                 responseBody.close();
             }
         }

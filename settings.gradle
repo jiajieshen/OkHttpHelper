@@ -1,1 +1,1 @@
-include ':app', ':okhttphelper'
+include ':app', ':okhttphelper', ':coverter-gson'

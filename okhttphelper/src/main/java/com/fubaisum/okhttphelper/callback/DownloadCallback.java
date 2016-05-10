@@ -1,7 +1,6 @@
 package com.fubaisum.okhttphelper.callback;
 
 import android.accounts.NetworkErrorException;
-import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,7 +19,7 @@ public abstract class DownloadCallback extends Callback<String> {
 
     private File destFile;
 
-    public DownloadCallback(@NonNull File destFile) {
+    public DownloadCallback(File destFile) {
         this.destFile = destFile;
     }
 
@@ -31,6 +30,9 @@ public abstract class DownloadCallback extends Callback<String> {
 
     @Override
     public void onResponse(Call call, Response response) throws IOException {
+        if (destFile == null) {
+            throw new NullPointerException("The dest file cannot be null.");
+        }
         if (!response.isSuccessful()) {
             sendFailureCallback(new NetworkErrorException(response.toString()));
         } else {
