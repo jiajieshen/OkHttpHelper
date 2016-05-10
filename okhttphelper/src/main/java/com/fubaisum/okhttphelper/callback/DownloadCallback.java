@@ -71,4 +71,6 @@ public abstract class DownloadCallback extends Callback<String> {
             }
         }
     }
+
+    public abstract void onResponseSuccess(String absolutePath);
 }
