@@ -1,51 +1,43 @@
 package com.fubaisum.okhttphelper.callback;
 
+
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.IntDef;
 
-import com.squareup.okhttp.Callback;
+import com.fubaisum.okhttphelper.ThreadMode;
 
 /**
- * Created by sum on 15-12-4.
+ * Created by sum on 5/9/16.
  */
-public abstract class OkHttpCallback<T> implements Callback {
+public abstract class Callback<T> implements okhttp3.Callback{
 
-    public static final int UI = 0;
-    public static final int WORKER = 1;
+    private ThreadMode threadMode = ThreadMode.MAIN;
 
-    @IntDef({UI, WORKER})
-    @interface CallbackMode {
-    }
-
-    @CallbackMode
-    private int callbackMode = UI;
-
-    public void setCallbackMode(@CallbackMode int callbackMode) {
-        this.callbackMode = callbackMode;
+    public void setThreadMode(ThreadMode threadMode) {
+        this.threadMode = threadMode;
     }
 
     protected void sendFailureCallback(final Exception e) {
-        switch (callbackMode) {
-            case UI: {
+        switch (threadMode) {
+            case MAIN: {
                 getMainHandler().post(new Runnable() {
                     @Override
                     public void run() {
-                        onResponseError(e);
+                        onResponseFailure(e);
                     }
                 });
                 break;
             }
-            case WORKER: {
-                onResponseError(e);
+            case BACKGROUND: {
+                onResponseFailure(e);
                 break;
             }
         }
     }
 
     protected void sendSuccessCallback(final T result) {
-        switch (callbackMode) {
-            case UI: {
+        switch (threadMode) {
+            case MAIN: {
                 getMainHandler().post(new Runnable() {
                     @Override
                     public void run() {
@@ -54,7 +46,7 @@ public abstract class OkHttpCallback<T> implements Callback {
                 });
                 break;
             }
-            case WORKER: {
+            case BACKGROUND: {
                 onResponseSuccess(result);
                 break;
             }
@@ -63,7 +55,7 @@ public abstract class OkHttpCallback<T> implements Callback {
 
     public abstract void onResponseSuccess(T result);
 
-    public abstract void onResponseError(Exception e);
+    public abstract void onResponseFailure(Exception e);
 
     /**
      *
@@ -75,5 +67,4 @@ public abstract class OkHttpCallback<T> implements Callback {
     private static class MainHandlerHolder {
         private static final Handler mainHandlerInstance = new Handler(Looper.getMainLooper());
     }
-
 }

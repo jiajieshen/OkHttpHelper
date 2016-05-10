@@ -1,10 +1,9 @@
 package com.fubaisum.okhttphelper.progress;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.RequestBody;
-
 import java.io.IOException;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.ForwardingSink;
@@ -21,11 +20,11 @@ class ProgressRequestBody extends RequestBody {
     //实际的待包装请求体
     private final RequestBody requestBody;
     //进度回调接口
-    private final OkHttpProgressListener progressListener;
+    private final ProgressListener progressListener;
     //包装完成的BufferedSink
     private BufferedSink bufferedSink;
 
-    public ProgressRequestBody(RequestBody requestBody, OkHttpProgressListener progressListener) {
+    public ProgressRequestBody(RequestBody requestBody, ProgressListener progressListener) {
         this.requestBody = requestBody;
         this.progressListener = progressListener;
     }

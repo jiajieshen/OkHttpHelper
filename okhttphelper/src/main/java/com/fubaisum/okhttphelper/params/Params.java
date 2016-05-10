@@ -1,10 +1,10 @@
 package com.fubaisum.okhttphelper.params;
 
-import com.squareup.okhttp.RequestBody;
+import okhttp3.RequestBody;
 
 /**
  * Created by sum on 15-10-2.
  */
-public interface OkHttpParams {
+public interface Params {
     RequestBody buildRequestBody();
 }

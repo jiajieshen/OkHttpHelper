@@ -1,23 +1,26 @@
 package com.fubaisum.okhttphelper.callback;
 
+import android.accounts.NetworkErrorException;
+
 import com.fubaisum.okhttphelper.GsonHolder;
 import com.google.gson.Gson;
 import com.google.gson.internal.$Gson$Types;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import okhttp3.Call;
+import okhttp3.Response;
+
 /**
  * Created by sum on 15-12-3.
  */
-public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
+public abstract class ModelCallBack<T> extends Callback<T> {
 
     private Type modelType;
 
-    public OkHttpModelCallBack() {
+    public ModelCallBack() {
         modelType = getSuperclassTypeParameter(getClass());
     }
 
@@ -31,14 +34,14 @@ public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
     }
 
     @Override
-    public void onFailure(Request request, IOException e) {
+    public void onFailure(Call call, IOException e) {
         sendFailureCallback(e);
     }
 
     @Override
-    public void onResponse(Response response) {
+    public void onResponse(Call call, Response response) throws IOException {
         if (!response.isSuccessful()) {
-            sendFailureCallback(new RuntimeException(response.toString()));
+            sendFailureCallback(new NetworkErrorException(response.toString()));
         } else {
             try {
                 String responseStr = response.body().string();
@@ -51,8 +54,9 @@ public abstract class OkHttpModelCallBack<T> extends OkHttpCallback<T> {
                 }
             } catch (Exception e) {
                 sendFailureCallback(e);
+            }finally {
+                response.body().close();
             }
         }
     }
-
 }

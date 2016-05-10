@@ -1,18 +1,19 @@
 package com.fubaisum.okhttphelper.progress;
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.Response;
 
 /**
  * Created by sum on 15-12-2.
  */
 class ResponseProgressInterceptor implements Interceptor {
 
-    private OkHttpProgressListener progressListener;
+    private ProgressListener progressListener;
 
-    public ResponseProgressInterceptor(OkHttpProgressListener progressListener) {
+    public ResponseProgressInterceptor(ProgressListener progressListener) {
         this.progressListener = progressListener;
     }
 

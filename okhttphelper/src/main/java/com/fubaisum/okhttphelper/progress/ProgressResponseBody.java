@@ -1,10 +1,10 @@
 package com.fubaisum.okhttphelper.progress;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
 import okio.Buffer;
 import okio.BufferedSource;
 import okio.ForwardingSource;
@@ -21,7 +21,7 @@ class ProgressResponseBody extends ResponseBody {
     //实际的待包装响应体
     private final ResponseBody responseBody;
     //进度回调接口
-    private final OkHttpProgressListener progressListener;
+    private final ProgressListener progressListener;
     //包装完成的BufferedSource
     private BufferedSource bufferedSource;
 
@@ -31,7 +31,7 @@ class ProgressResponseBody extends ResponseBody {
      * @param responseBody     待包装的响应体
      * @param progressListener 回调接口
      */
-    public ProgressResponseBody(ResponseBody responseBody, OkHttpProgressListener progressListener) {
+    public ProgressResponseBody(ResponseBody responseBody, ProgressListener progressListener) {
         this.responseBody = responseBody;
         this.progressListener = progressListener;
     }
@@ -51,10 +51,9 @@ class ProgressResponseBody extends ResponseBody {
      * 重写调用实际的响应体的contentLength
      *
      * @return contentLength
-     * @throws IOException 异常
      */
     @Override
-    public long contentLength() throws IOException {
+    public long contentLength() {
         return responseBody.contentLength();
     }
 
@@ -62,10 +61,9 @@ class ProgressResponseBody extends ResponseBody {
      * 重写进行包装source
      *
      * @return BufferedSource
-     * @throws IOException 异常
      */
     @Override
-    public BufferedSource source() throws IOException {
+    public BufferedSource source() {
         if (bufferedSource == null) {
             //包装
             bufferedSource = Okio.buffer(source(responseBody.source()));

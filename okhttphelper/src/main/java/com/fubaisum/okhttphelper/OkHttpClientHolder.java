@@ -1,6 +1,7 @@
 package com.fubaisum.okhttphelper;
 
-import com.squareup.okhttp.OkHttpClient;
+
+import okhttp3.OkHttpClient;
 
 /**
  * Created by sum on 15-12-3.

@@ -6,8 +6,8 @@ import android.widget.TextView;
 
 import com.facebook.stetho.common.LogUtil;
 import com.fubaisum.okhttphelper.OkHttpRequest;
-import com.fubaisum.okhttphelper.callback.OkHttpDownloadCallback;
-import com.fubaisum.okhttphelper.progress.OkHttpUiProgressListener;
+import com.fubaisum.okhttphelper.callback.DownloadCallback;
+import com.fubaisum.okhttphelper.progress.UiProgressListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         new OkHttpRequest.Builder()
                 .url("http://pic41.nipic.com/20140430/18021738_213628575106_2.jpg")
-                .responseProgress(new OkHttpUiProgressListener() {
+                .responseProgress(new UiProgressListener() {
                     @Override
                     public void onUiProgress(long currentBytesCount, long totalBytesCount) {
                         if (totalBytesCount == -1) {
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build()
-                .uiCallback(new OkHttpDownloadCallback(getExternalCacheDir().getAbsolutePath(), "test.png") {
+                .uiCallback(new DownloadCallback(getExternalCacheDir().getAbsolutePath(), "test.png") {
                     @Override
                     public void onResponseSuccess(String fileAbsolutePath) {
                         LogUtil.e("fileAbsolutePath = " + fileAbsolutePath);
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onResponseError(Exception e) {
-                        LogUtil.e("download onResponseError() : " + e);
+                        LogUtil.e("download onResponseFailure() : " + e);
                     }
                 });
     }

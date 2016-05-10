@@ -9,7 +9,7 @@ import java.lang.ref.WeakReference;
 /**
  * Created by sum on 15-12-8.
  */
-public abstract class OkHttpUiProgressListener implements OkHttpProgressListener {
+public abstract class UiProgressListener implements ProgressListener {
 
     private static final int MSG_UI_PROGRESS = 0x123;
     private static final long DEFAULT_PROGRESS_PERIOD = 600;
@@ -56,9 +56,9 @@ public abstract class OkHttpUiProgressListener implements OkHttpProgressListener
 
     private static class UiHandler extends Handler {
 
-        private WeakReference<OkHttpUiProgressListener> weakReference;
+        private WeakReference<UiProgressListener> weakReference;
 
-        private UiHandler(OkHttpUiProgressListener uiProgressListener) {
+        private UiHandler(UiProgressListener uiProgressListener) {
             super(Looper.getMainLooper());
             weakReference = new WeakReference<>(uiProgressListener);
         }
@@ -68,7 +68,7 @@ public abstract class OkHttpUiProgressListener implements OkHttpProgressListener
             if (msg.what != MSG_UI_PROGRESS) {
                 return;
             }
-            OkHttpUiProgressListener uiProgressListener = weakReference.get();
+            UiProgressListener uiProgressListener = weakReference.get();
             if (null != uiProgressListener) {
                 uiProgressListener.onUiProgress(
                         uiProgressListener.currentBytesCount, uiProgressListener.totalBytesCount);

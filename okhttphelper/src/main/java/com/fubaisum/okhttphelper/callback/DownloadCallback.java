@@ -1,36 +1,37 @@
 package com.fubaisum.okhttphelper.callback;
 
+import android.accounts.NetworkErrorException;
 import android.support.annotation.NonNull;
-
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import okhttp3.Call;
+import okhttp3.Response;
+
 /**
  * PS：如果下载文件成功，返回参数为文件的绝对路径
  * Created by sum on 15-10-2.
  */
-public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
+public abstract class DownloadCallback extends Callback<String> {
 
     private File destFile;
 
-    public OkHttpDownloadCallback(@NonNull File destFile) {
+    public DownloadCallback(@NonNull File destFile) {
         this.destFile = destFile;
     }
 
     @Override
-    public void onFailure(Request request, IOException e) {
+    public void onFailure(Call call, IOException e) {
         sendFailureCallback(e);
     }
 
     @Override
-    public void onResponse(Response response) throws IOException {
+    public void onResponse(Call call, Response response) throws IOException {
         if (!response.isSuccessful()) {
-            sendFailureCallback(new RuntimeException(response.toString()));
+            sendFailureCallback(new NetworkErrorException(response.toString()));
         } else {
             InputStream inputStream = response.body().byteStream();
             byte[] buffer = new byte[2048];
@@ -60,6 +61,4 @@ public abstract class OkHttpDownloadCallback extends OkHttpCallback<String> {
             }
         }
     }
-
-    public abstract void onResponseSuccess(String fileAbsolutePath);
 }
