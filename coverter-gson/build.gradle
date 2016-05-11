@@ -1,5 +1,29 @@
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'converter-gson'
+
+    publishedGroupId = 'com.scausum.okhttphelper'
+    libraryName = 'GsonConverter'
+    artifact = 'converter-gson'
+
+    libraryDescription = 'A gson converter module for OkHttpHelper.'
+
+    siteUrl = 'https://github.com/fubaisum/OkHttpHelper'
+    gitUrl = 'https://github.com/fubaisum/OkHttpHelper.git'
+
+    libraryVersion = '2.0.0'
+
+    developerId = 'scausum'
+    developerName = 'SCAU SUM'
+    developerEmail = 'scausum@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -20,6 +44,9 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':okhttphelper')
+    provided project(':okhttphelper')
     compile 'com.google.code.gson:gson:2.6.2'
 }
+
+apply from: 'http://fubaisum.github.io/installv1.gradle'
+apply from: 'http://fubaisum.github.io/bintrayv1.gradle'

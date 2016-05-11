@@ -47,5 +47,5 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
 }
 
-//apply from: 'http://fubaisum.github.io/installv1.gradle'
-//apply from: 'http://fubaisum.github.io/bintrayv1.gradle'
+apply from: 'http://fubaisum.github.io/installv1.gradle'
+apply from: 'http://fubaisum.github.io/bintrayv1.gradle'
