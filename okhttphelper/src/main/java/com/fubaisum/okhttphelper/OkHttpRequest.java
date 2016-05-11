@@ -100,7 +100,7 @@ public class OkHttpRequest {
                     //noinspection unchecked
                     return (T) responseBody.string();
                 } else {
-                    return modelParser.parseResponse(responseBody,tClass);
+                    return modelParser.parseResponse(responseBody, tClass);
                 }
             } finally {
                 responseBody.close();
@@ -111,14 +111,13 @@ public class OkHttpRequest {
     }
 
 
-
-
     public OkHttpRequest threadMode(ThreadMode threadMode) {
         this.threadMode = threadMode;
         return this;
     }
 
     public <T> void callback(Callback<T> callback) {
+        callback.setThreadMode(threadMode);
         executeAsynRequest(callback);
     }
 
