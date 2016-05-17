@@ -10,7 +10,10 @@ repositories {
 }
 
 dependencies {
-    compile 'com.scausum.okhttphelper:okhttphelper:1.0.0'
+    compile 'com.scausum.okhttphelper:okhttphelper:2.0.4'
+    compile 'com.scausum.okhttphelper:converter-gson:2.0.4'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.google.code.gson:gson:2.6.2'
 }
 
 </code></pre>
@@ -19,7 +22,6 @@ dependencies {
 构建Get请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
-                .tag(tag)
                 .url(url)
                 .appendUrlParam(key, value)
                 .appendHeader(line)
@@ -30,7 +32,6 @@ dependencies {
 构建Post请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
-                .tag(tag)
                 .url(url)
                 .appendUrlParam(key, value)
                 .appendHeader(line)
@@ -43,17 +44,17 @@ dependencies {
 Post参数构建
 
         //普通表单参数
-        OkHttpFormParams okHttpParams = new OkHttpFormParams();
-        okHttpParams.put(key,value);
+        FormParams params = new FormParams();
+        params.put(key,value);
         
         //多类型参数
-        OkHttpMultiTypeParams okHttpParams = new OkHttpMultiTypeParams();
-        okHttpParams.put(key,value);
-        okHttpParams.put(key,file);
-        okHttpParams.put(key,fileName,bytes);
+        MultiTypeParams params = new MultiTypeParams();
+        params.put(key,value);
+        params.put(key,file);
+        params.put(key,fileName,bytes);
         
         //Json参数
-        OkHttpJsonParams okHttpJsonParams = new OkHttpJsonParams(json);
+        JsonParams jsonParams = new JsonParams(json);
 
 执行同步请求
 
@@ -63,14 +64,17 @@ Post参数构建
 
 执行异步请求
 
-        okHttpRequest.uiCallback(okHttpCallback);//Ui线程回调
-        okHttpRequest.workerCallback(okHttpCallback);//工作线程回调
+        okHttpRequest.threadMode(ThreadMode.MAIN)//default
+                uiCallback(okHttpCallback);//Ui线程回调
+                
+        okHttpRequest.threadMode(ThreadMode.BACKGROUND)
+                uiCallback(okHttpCallback);//后台线程回调
 
 Model回调
 
-        new OkHttpModelCallBack<String>() {
+        new ModelCallBack<T>() {
             @Override
-            public void onResponseSuccess(String result) {
+            public void onResponseSuccess(T result) {
             }
 
             @Override
@@ -80,7 +84,7 @@ Model回调
 
 下载文件回调
 
-        new OkHttpDownloadCallback(destFile) {
+        new DownloadCallback(destFile) {
 
             @Override
             public void onResponseSuccess(String fileAbsolutePath) {
@@ -93,7 +97,7 @@ Model回调
 
 进度监听
 
-        new OkHttpUiProgressListener() {
+        new UiProgressListener() {
             @Override
             protected void onUiProgress(long currentBytesCount, long totalBytesCount) {
                 if (totalBytesCount == -1) {
