@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/fubaisum/OkHttpHelper'
     gitUrl = 'https://github.com/fubaisum/OkHttpHelper.git'
 
-    libraryVersion = '2.0.2'
+    libraryVersion = '2.0.3'
 
     developerId = 'scausum'
     developerName = 'SCAU SUM'
@@ -36,8 +36,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 3
-        versionName "2.0.2"
+        versionCode 203
+        versionName "2.0.3"
     }
     buildTypes {
         release {
