@@ -178,7 +178,7 @@ public class OkHttpRequest {
     }
 
     public void cancel() {
-        if (call != null) {
+        if (call != null && !call.isCanceled()) {
             call.cancel();
         }
     }

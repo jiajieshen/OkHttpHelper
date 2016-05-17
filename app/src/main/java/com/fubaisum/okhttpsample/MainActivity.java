@@ -10,7 +10,6 @@ import com.fubaisum.okhttphelper.ThreadMode;
 import com.fubaisum.okhttphelper.callback.DownloadCallback;
 import com.fubaisum.okhttphelper.callback.ModelCallBack;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
-import com.scausum.okhttphelper.converter.gson.GsonConverterFactory;
 
 import java.io.File;
 
@@ -29,11 +28,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testParseModel() {
-        OkHttpRequest.setConverterFactory(GsonConverterFactory.create());
         new OkHttpRequest.Builder()
                 .url("http://fubaisum.github.io/testUser")
                 .build()
-                .threadMode(ThreadMode.MAIN)
+                .threadMode(ThreadMode.MAIN)//default
                 .callback(new ModelCallBack<User>() {
 
                     @Override
