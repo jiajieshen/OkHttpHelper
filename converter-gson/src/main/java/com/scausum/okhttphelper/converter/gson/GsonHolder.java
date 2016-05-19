@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 /**
  * Created by sum on 5/10/16.
  */
-public class GsonHolder {
+class GsonHolder {
 
     private volatile static Gson gson;
 
