@@ -19,6 +19,12 @@ dependencies {
 </code></pre>
 
 ## 用法示例
+
+初始化使用GSON来解析json
+<p><code>
+        OkHttpRequest.setConverterFactory(GsonConverterFactory.create());
+</code></p>
+
 构建Get请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
