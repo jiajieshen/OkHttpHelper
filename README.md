@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.scausum.okhttphelper:okhttphelper:2.0.5'
-    compile 'com.scausum.okhttphelper:converter-gson:2.0.5'
+    compile 'com.scausum.okhttphelper:okhttphelper:2.0.6'
+    compile 'com.scausum.okhttphelper:converter-gson:2.0.6'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.google.code.gson:gson:2.6.2'
 }
@@ -120,11 +120,7 @@ Model回调
 
 全局配置
 
-        OkHttpClient okHttpClient = OkHttpClientHolder.getOkHttpClient();
-        // eg.
-        okHttpClient.networkInterceptors().add(new StethoInterceptor());
-        // eg.
-        okHttpClient.setConnectTimeout(10000, TimeUnit.SECONDS);
+                OkHttpClientHolder.addNetworkInterceptor(new StethoInterceptor());
 
 
 # 参考
