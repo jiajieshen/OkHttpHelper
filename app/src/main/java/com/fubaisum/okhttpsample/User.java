@@ -1,23 +1,22 @@
 package com.fubaisum.okhttpsample;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by sum on 5/10/16.
  */
 public class User {
-    public String name;
-    public String birthday;
-    public String region;
-    public String address;
+    public String nickname;
     public String avatar;
+    @SerializedName("referral_code")
+    public String activationCode;
 
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
-                ", birthday='" + birthday + '\'' +
-                ", region='" + region + '\'' +
-                ", address='" + address + '\'' +
+                "nickname='" + nickname + '\'' +
                 ", avatar='" + avatar + '\'' +
+                ", activationCode='" + activationCode + '\'' +
                 '}';
     }
 }

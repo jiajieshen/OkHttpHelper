@@ -9,6 +9,7 @@ import com.fubaisum.okhttphelper.OkHttpRequest;
 import com.fubaisum.okhttphelper.ThreadMode;
 import com.fubaisum.okhttphelper.callback.DownloadCallback;
 import com.fubaisum.okhttphelper.callback.ModelCallBack;
+import com.fubaisum.okhttphelper.params.FormParams;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
 
 import java.io.File;
@@ -28,38 +29,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testParseModel() {
+        FormParams params = new FormParams();
+        params.put("token", "123");
         new OkHttpRequest.Builder()
-                .url("http://fubaisum.github.io/testUser")
+                .url("http://api.youqingjia.com/user/info")
+                .post(params)
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
-                .callback(new ModelCallBack<User>() {
-
-                    @Override
-                    public void onResponseSuccess(User user) {
-                        Log.e("MainActivity", "async success = " + user);
-                    }
-
-                    @Override
-                    public void onResponseFailure(Exception e) {
-                        Log.e("MainActivity", "async error = " + e);
-                    }
-                });
-
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    User user = new OkHttpRequest.Builder().url("http://fubaisum.github.io/testUser")
-                            .build().model(User.class);
-                    Log.e("MainActivity", "sync success = " + user);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e("MainActivity", "sync error = " + e);
-                }
-            }
-        }.start();
+                .callback(modelCallBack);
     }
+
+    private ModelCallBack<Api<User>> modelCallBack = new ModelCallBack<Api<User>>() {
+        @Override
+        public void onResponseSuccess(Api<User> result) {
+            Log.e("MainActivity", "result = " + result);
+        }
+
+        @Override
+        public void onResponseFailure(Exception e) {
+            Log.e("MainActivity", " error = " + e);
+        }
+    };
+
+    private ApiCallback<User> apiCallback = new ApiCallback<User>() {
+
+        @Override
+        protected void onApiSuccess(User data) {
+            Log.e("MainActivity", "async success = " + data);
+        }
+
+        @Override
+        protected void onApiFailure(String message) {
+            Log.e("MainActivity", "async error = " + message);
+        }
+    };
 
     private void testDownload() {
         File file = new File(getCacheDir().getAbsolutePath(), "test.png");
