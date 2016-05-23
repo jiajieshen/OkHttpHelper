@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.scausum.okhttphelper:okhttphelper:2.0.6'
-    compile 'com.scausum.okhttphelper:converter-gson:2.0.6'
+    compile 'com.scausum.okhttphelper:okhttphelper:2.0.7'
+    compile 'com.scausum.okhttphelper:converter-gson:2.0.7'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.google.code.gson:gson:2.6.2'
 }
@@ -120,7 +120,9 @@ Model回调
 
 全局配置
 
-                OkHttpClientHolder.addNetworkInterceptor(new StethoInterceptor());
+        // 添加Stetho网络拦截器
+        Stetho.initializeWithDefaults(this);
+        OkHttpClientHolder.addNetworkInterceptor(new StethoInterceptor());
 
 
 # 参考
