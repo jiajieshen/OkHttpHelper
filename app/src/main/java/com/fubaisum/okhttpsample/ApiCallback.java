@@ -3,6 +3,7 @@ package com.fubaisum.okhttpsample;
 import android.util.Log;
 
 import com.fubaisum.okhttphelper.callback.ModelCallBack;
+import com.google.gson.internal.$Gson$Types;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -14,23 +15,30 @@ public abstract class ApiCallback<T> extends ModelCallBack<Api<T>> {
 
     private static final String NETWORK_ERROR = "网络错误";
 
-    public ApiCallback() {
-        Type modelType = getGenericTypeParameter(getClass().getSuperclass());
-        Log.e("ApiCallback", "modelType = " + modelType);
+    @Override
+    protected Type genericModelType() {
+        final Type subType = getGenericTypeParameter(getClass());
+        Type modelType = new ParameterizedType() {
+
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[]{subType};
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+
+            @Override
+            public Type getRawType() {
+                return Api.class;
+            }
+        };
+        modelType = $Gson$Types.canonicalize(modelType);
+        Log.e("ApiCallback", "ModelType = " + modelType);
+        return modelType;
     }
-
-    protected static Type getGenericTypeParameter(Class<?> thisClass) {
-        Type superclass = thisClass.getGenericSuperclass();
-        Log.e("ApiCallback", "superclass = " + superclass);
-        if (superclass instanceof Class) {
-            throw new RuntimeException("Missing modelType parameter.");
-        }
-        ParameterizedType parameterizedType = (ParameterizedType) superclass;
-        Log.e("ApiCallback", "parameterizedType = " + parameterizedType);
-        return parameterizedType.getActualTypeArguments()[0];
-    }
-
-
 
     protected abstract void onApiSuccess(T data);
 

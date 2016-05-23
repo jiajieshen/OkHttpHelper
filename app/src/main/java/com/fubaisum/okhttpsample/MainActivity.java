@@ -9,7 +9,6 @@ import com.fubaisum.okhttphelper.OkHttpRequest;
 import com.fubaisum.okhttphelper.ThreadMode;
 import com.fubaisum.okhttphelper.callback.DownloadCallback;
 import com.fubaisum.okhttphelper.callback.ModelCallBack;
-import com.fubaisum.okhttphelper.params.FormParams;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
 
 import java.io.File;
@@ -29,40 +28,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testParseModel() {
-        FormParams params = new FormParams();
-        params.put("token", "123");
         new OkHttpRequest.Builder()
-                .url("http://api.youqingjia.com/user/info")
-                .post(params)
+                .url("http://www.baidu.com/")
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
-                .callback(modelCallBack);
+                .callback(new ModelCallBack<Object>() {
+                    @Override
+                    public void onResponseSuccess(Object result) {
+
+                    }
+
+                    @Override
+                    public void onResponseFailure(Exception e) {
+
+                    }
+                });
     }
-
-    private ModelCallBack<Api<User>> modelCallBack = new ModelCallBack<Api<User>>() {
-        @Override
-        public void onResponseSuccess(Api<User> result) {
-            Log.e("MainActivity", "result = " + result);
-        }
-
-        @Override
-        public void onResponseFailure(Exception e) {
-            Log.e("MainActivity", " error = " + e);
-        }
-    };
-
-    private ApiCallback<User> apiCallback = new ApiCallback<User>() {
-
-        @Override
-        protected void onApiSuccess(User data) {
-            Log.e("MainActivity", "async success = " + data);
-        }
-
-        @Override
-        protected void onApiFailure(String message) {
-            Log.e("MainActivity", "async error = " + message);
-        }
-    };
 
     private void testDownload() {
         File file = new File(getCacheDir().getAbsolutePath(), "test.png");

@@ -1,7 +1,6 @@
 package com.fubaisum.okhttphelper.callback;
 
 import android.accounts.NetworkErrorException;
-import android.util.Log;
 
 import com.fubaisum.okhttphelper.ModelParser;
 
@@ -18,23 +17,24 @@ import okhttp3.ResponseBody;
  */
 public abstract class ModelCallBack<T> extends Callback<T> {
 
-    protected Type modelType;
+    private Type modelType;
     private ModelParser<T> modelParser;
 
     public ModelCallBack() {
-        modelType = getGenericTypeParameter(getClass());
-        Log.e("ModelCallBack", "modelType = " + modelType);
-        modelParser = new ModelParser<T>();
+        modelType = genericModelType();
+        modelParser = new ModelParser<>();
+    }
+
+    protected Type genericModelType() {
+        return getGenericTypeParameter(getClass());
     }
 
     protected static Type getGenericTypeParameter(Class<?> thisClass) {
-        Type superclass = thisClass.getGenericSuperclass();
-        Log.e("ModelCallBack", "superclass = " + superclass);
-        if (superclass instanceof Class) {
+        Type genericSuperclass = thisClass.getGenericSuperclass();
+        if (genericSuperclass instanceof Class) {
             throw new RuntimeException("Missing modelType parameter.");
         }
-        ParameterizedType parameterizedType = (ParameterizedType) superclass;
-        Log.e("ModelCallBack", "parameterizedType = " + parameterizedType);
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         return parameterizedType.getActualTypeArguments()[0];
     }
 
