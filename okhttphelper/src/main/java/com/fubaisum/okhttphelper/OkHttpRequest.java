@@ -42,7 +42,8 @@ public class OkHttpRequest {
 
     private OkHttpRequest(String url,
                           Headers headers,
-                          Params params, ProgressListener requestProgressListener,
+                          Params params,
+                          ProgressListener requestProgressListener,
                           ProgressListener responseProgressListener) {
         this.url = url;
         this.headers = headers;
@@ -166,14 +167,12 @@ public class OkHttpRequest {
             return OkHttpClientHolder.getOkHttpClient();
         } else {
             OkHttpClient okHttpClient = OkHttpClientHolder.getOkHttpClient();
-            Interceptor interceptor =
+            Interceptor responseProgressInterceptor =
                     ProgressHelper.newResponseProgressInterceptor(responseProgressListener);
 
-            OkHttpClient clone = okHttpClient.newBuilder()
-                    .addNetworkInterceptor(interceptor)
+            return okHttpClient.newBuilder()
+                    .addNetworkInterceptor(responseProgressInterceptor)
                     .build();
-
-            return clone;
         }
     }
 
@@ -187,7 +186,6 @@ public class OkHttpRequest {
 
         private String url;
         private StringBuilder urlBuilder = new StringBuilder();
-        private Headers headers;
         private Headers.Builder headersBuilder;
         private Params params;
         private ProgressListener requestProgressListener;
@@ -238,10 +236,9 @@ public class OkHttpRequest {
 
         public OkHttpRequest build() {
             url = urlBuilder.deleteCharAt(urlBuilder.length() - 1).toString();
-            if (headersBuilder != null) {
-                headers = headersBuilder.build();
-            }
-            return new OkHttpRequest(url, headers, params, requestProgressListener, responseProgressListener);
+            Headers headers = headersBuilder != null ? headersBuilder.build() : null;
+            return new OkHttpRequest(url, headers, params,
+                    requestProgressListener, responseProgressListener);
         }
     }
 }

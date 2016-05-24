@@ -39,12 +39,12 @@ public abstract class ModelCallBack<T> extends Callback<T> {
     }
 
     @Override
-    public void onFailure(Call call, IOException e) {
+    public final void onFailure(Call call, IOException e) {
         sendFailureCallback(e);
     }
 
     @Override
-    public void onResponse(Call call, Response response) throws IOException {
+    public final void onResponse(Call call, Response response) throws IOException {
         if (!response.isSuccessful()) {
             sendFailureCallback(new NetworkErrorException(response.toString()));
         } else {

@@ -24,14 +24,14 @@ public abstract class DownloadCallback extends Callback<String> {
     }
 
     @Override
-    public void onFailure(Call call, IOException e) {
+    public final void onFailure(Call call, IOException e) {
         sendFailureCallback(e);
     }
 
     @Override
-    public void onResponse(Call call, Response response) throws IOException {
+    public final void onResponse(Call call, Response response) throws IOException {
         if (destFile == null) {
-            throw new NullPointerException("The dest file cannot be null.");
+            sendFailureCallback(new IllegalArgumentException("The destFile cannot be null."));
         }
         if (!response.isSuccessful()) {
             sendFailureCallback(new NetworkErrorException(response.toString()));
@@ -74,5 +74,6 @@ public abstract class DownloadCallback extends Callback<String> {
         }
     }
 
-    public abstract void onResponseSuccess(String absolutePath);
+
+    protected abstract void onResponseSuccess(String absolutePath);
 }

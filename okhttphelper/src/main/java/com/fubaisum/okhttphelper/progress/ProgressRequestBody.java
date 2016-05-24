@@ -87,7 +87,7 @@ class ProgressRequestBody extends RequestBody {
                 writtenBytesCount += byteCount;
 
                 //获得contentLength的值，后续不再调用
-                if (totalBytesCount == 0) {
+                if (totalBytesCount == 0L) {
                     totalBytesCount = contentLength();
                 }
 

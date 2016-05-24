@@ -12,25 +12,20 @@ import okhttp3.ResponseBody;
 
 public final class GsonConverterFactory extends Converter.Factory {
 
-    private final Gson gson;
-
     public static GsonConverterFactory create() {
-        return new GsonConverterFactory(GsonHolder.getGson());
-    }
-
-    private GsonConverterFactory(Gson gson) {
-        if (gson == null) throw new NullPointerException("gson == null");
-        this.gson = gson;
+        return new GsonConverterFactory();
     }
 
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(Type type) {
+        Gson gson = GsonHolder.getGson();
         TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
         return new GsonResponseBodyConverter<>(gson, adapter);
     }
 
     @Override
     public Converter<?, RequestBody> requestBodyConverter(Type type) {
+        Gson gson = GsonHolder.getGson();
         TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
         return new GsonRequestBodyConverter<>(gson, adapter);
     }

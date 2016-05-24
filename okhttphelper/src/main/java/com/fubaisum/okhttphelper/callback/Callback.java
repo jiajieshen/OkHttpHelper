@@ -9,7 +9,9 @@ import com.fubaisum.okhttphelper.ThreadMode;
 /**
  * Created by sum on 5/9/16.
  */
-public abstract class Callback<T> implements okhttp3.Callback{
+public abstract class Callback<T> implements okhttp3.Callback {
+
+    private static Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private ThreadMode threadMode = ThreadMode.MAIN;
 
@@ -17,10 +19,10 @@ public abstract class Callback<T> implements okhttp3.Callback{
         this.threadMode = threadMode;
     }
 
-    protected void sendFailureCallback(final Exception e) {
+    protected final void sendFailureCallback(final Exception e) {
         switch (threadMode) {
             case MAIN: {
-                getMainHandler().post(new Runnable() {
+                mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         onResponseFailure(e);
@@ -35,10 +37,10 @@ public abstract class Callback<T> implements okhttp3.Callback{
         }
     }
 
-    protected void sendSuccessCallback(final T result) {
+    protected final void sendSuccessCallback(final T result) {
         switch (threadMode) {
             case MAIN: {
-                getMainHandler().post(new Runnable() {
+                mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         onResponseSuccess(result);
@@ -53,18 +55,8 @@ public abstract class Callback<T> implements okhttp3.Callback{
         }
     }
 
-    public abstract void onResponseSuccess(T result);
+    protected abstract void onResponseSuccess(T result);
 
-    public abstract void onResponseFailure(Exception e);
+    protected abstract void onResponseFailure(Exception e);
 
-    /**
-     *
-     */
-    protected static Handler getMainHandler() {
-        return MainHandlerHolder.mainHandlerInstance;
-    }
-
-    private static class MainHandlerHolder {
-        private static final Handler mainHandlerInstance = new Handler(Looper.getMainLooper());
-    }
 }
