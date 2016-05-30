@@ -61,15 +61,15 @@ Post参数构建
 
         InputStream inputStream = okHttpRequest.byteStream();
         String string = okHttpRequest.string();
-        User model = okHttpRequest.model();
+        T model = okHttpRequest.model();
 
 执行异步请求
 
         okHttpRequest.threadMode(ThreadMode.MAIN)//default
-                uiCallback(okHttpCallback);//Ui线程回调
+                .uiCallback(okHttpCallback);//Ui线程回调
                 
         okHttpRequest.threadMode(ThreadMode.BACKGROUND)
-                uiCallback(okHttpCallback);//后台线程回调
+                .uiCallback(okHttpCallback);//后台线程回调
 
 Model回调
 
