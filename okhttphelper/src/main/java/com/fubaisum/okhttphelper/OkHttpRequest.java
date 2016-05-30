@@ -56,13 +56,6 @@ public class OkHttpRequest {
         }
     }
 
-    /**
-     * 给Model解析器设置ConverterFactory
-     */
-    public static void setConverterFactory(Converter.Factory converterFactory) {
-        ModelParser.setConverterFactory(converterFactory);
-    }
-
     public InputStream byteStream() throws Exception {
         Response response = executeSyncRequest();
         if (response.isSuccessful()) {
@@ -164,9 +157,9 @@ public class OkHttpRequest {
 
     private OkHttpClient getOkHttpClient() {
         if (responseProgressListener == null) {
-            return OkHttpClientHolder.getOkHttpClient();
+            return OkHttpHelper.getOkHttpClient();
         } else {
-            OkHttpClient okHttpClient = OkHttpClientHolder.getOkHttpClient();
+            OkHttpClient okHttpClient = OkHttpHelper.getOkHttpClient();
             Interceptor responseProgressInterceptor =
                     ProgressHelper.newResponseProgressInterceptor(responseProgressListener);
 

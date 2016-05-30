@@ -36,39 +36,43 @@ public abstract class DownloadCallback extends Callback<String> {
         if (!response.isSuccessful()) {
             sendFailureCallback(new NetworkErrorException(response.toString()));
         } else {
-            ResponseBody responseBody = response.body();
-            InputStream inputStream = null;
-            FileOutputStream fileOutputStream = null;
-            byte[] buffer = new byte[2048];
-            int readBytesCount;
-            try {
-                inputStream = responseBody.byteStream();
-                fileOutputStream = new FileOutputStream(destFile);
-                while ((readBytesCount = inputStream.read(buffer)) != -1) {
-                    fileOutputStream.write(buffer, 0, readBytesCount);
+            writeToDestFile(response);
+        }
+    }
+
+    private void writeToDestFile(Response response) {
+        ResponseBody responseBody = response.body();
+        InputStream inputStream = null;
+        FileOutputStream fileOutputStream = null;
+        byte[] buffer = new byte[2048];
+        int readBytesCount;
+        try {
+            inputStream = responseBody.byteStream();
+            fileOutputStream = new FileOutputStream(destFile);
+            while ((readBytesCount = inputStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, readBytesCount);
+            }
+            fileOutputStream.flush();
+            // 下载文件成功，返回参数为文件的绝对路径
+            sendSuccessCallback(destFile.getAbsolutePath());
+        } catch (IOException e) {
+            sendFailureCallback(e);
+        } finally {
+            // 关闭responseBody
+            responseBody.close();
+            // 关闭输入输出流
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                fileOutputStream.flush();
-                // 下载文件成功，返回参数为文件的绝对路径
-                sendSuccessCallback(destFile.getAbsolutePath());
-            } catch (IOException e) {
-                sendFailureCallback(e);
-            } finally {
-                // 关闭responseBody
-                responseBody.close();
-                // 关闭输入输出流
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (fileOutputStream != null) {
-                    try {
-                        fileOutputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            }
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
