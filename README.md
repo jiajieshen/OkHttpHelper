@@ -20,11 +20,6 @@ dependencies {
 
 ## 用法示例
 
-初始化使用GSON来解析json
-<p><code>
-        OkHttpRequest.setConverterFactory(GsonConverterFactory.create());
-</code></p>
-
 构建Get请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
@@ -118,11 +113,19 @@ Model回调
 
         okHttpRequest.cancel();
 
+初始化使用GSON来解析json
+<p><code>
+        OkHttpHelper.setConverterFactory(GsonConverterFactory.create());
+</code></p>
+
 全局配置
 
         // 添加Stetho网络拦截器
         Stetho.initializeWithDefaults(this);
-        OkHttpClientHolder.addNetworkInterceptor(new StethoInterceptor());
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
+        OkHttpHelper.setOkHttpClient(okHttpClient);
 
 
 # 参考
@@ -134,3 +137,6 @@ https://github.com/lizhangqu/CoreProgress.git
 
 OkHttp的辅助类
 https://github.com/hongyangAndroid/okhttp-utils.git
+
+采用Converter.Factory类分离Model层的解析实现
+https://github.com/square/retrofit.git
