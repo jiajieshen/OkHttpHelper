@@ -29,6 +29,7 @@ public class OkHttpRequest {
     private static final int METHOD_POST = 1;
 
     private int requestMethod = METHOD_GET;
+
     private String url;
     private Headers headers;
     private ProgressListener requestProgressListener;

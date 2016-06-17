@@ -20,19 +20,22 @@ public class MultipartParams implements Params {
         multipartBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
     }
 
-    public void put(String key, String value) {
+    public MultipartParams put(String key, String value) {
         multipartBuilder.addFormDataPart(key, value);
+        return this;
     }
 
-    public void put(String key, File file) {
+    public MultipartParams put(String key, File file) {
         String fileName = file.getName();
         RequestBody fileRequestBody = RequestBody.create(MEDIA_TYPE_STREAM, file);
         multipartBuilder.addFormDataPart(key, fileName, fileRequestBody);
+        return this;
     }
 
-    public void put(String key, String fileName, byte[] bytes) {
+    public MultipartParams put(String key, String fileName, byte[] bytes) {
         RequestBody fileRequestBody = RequestBody.create(MEDIA_TYPE_STREAM, bytes);
         multipartBuilder.addFormDataPart(key, fileName, fileRequestBody);
+        return this;
     }
 
     @Override

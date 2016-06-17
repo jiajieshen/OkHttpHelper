@@ -15,8 +15,9 @@ public class FormParams implements Params {
         formBodyBuilder = new FormBody.Builder();
     }
 
-    public void put(String key, String value) {
+    public FormParams put(String key, String value) {
         formBodyBuilder.add(key, value);
+        return this;
     }
 
     public RequestBody buildRequestBody() {

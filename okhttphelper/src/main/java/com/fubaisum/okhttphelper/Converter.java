@@ -10,6 +10,7 @@ import okhttp3.ResponseBody;
  * Created by sum on 5/10/16.
  */
 public interface Converter<F, T> {
+
     T convert(F value) throws IOException;
 
     abstract class Factory {

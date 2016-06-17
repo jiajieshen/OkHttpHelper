@@ -7,7 +7,7 @@ import okhttp3.ResponseBody;
 /**
  * Created by sum on 5/10/16.
  */
-public class ModelParser<T>{
+public class ModelParser<T> {
 
     protected static Converter.Factory converterFactory;
 
@@ -15,7 +15,7 @@ public class ModelParser<T>{
         ModelParser.converterFactory = converterFactory;
     }
 
-    public T parseResponse(ResponseBody responseBody,Type modelType) throws Exception {
+    public T parseResponse(ResponseBody responseBody, Type modelType) throws Exception {
         if (converterFactory == null) {
             throw new NullPointerException("The converterFactory can't be null.");
         }
