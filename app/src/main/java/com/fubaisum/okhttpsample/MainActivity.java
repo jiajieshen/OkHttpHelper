@@ -8,7 +8,6 @@ import android.widget.TextView;
 import com.fubaisum.okhttphelper.OkHttpRequest;
 import com.fubaisum.okhttphelper.ThreadMode;
 import com.fubaisum.okhttphelper.callback.DownloadCallback;
-import com.fubaisum.okhttphelper.callback.ModelCallBack;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
 
 import java.io.File;
@@ -32,16 +31,18 @@ public class MainActivity extends AppCompatActivity {
                 .url("http://fubaisum.github.io/testUser")
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
-                .callback(new ModelCallBack<User>() {
+                .callback(new ApiCallback<User>() {
+
                     @Override
-                    public void onResponseSuccess(User user) {
+                    protected void onApiSuccess(User user) {
                         Log.e("MainActivity", user.toString());
                     }
 
                     @Override
-                    public void onResponseFailure(Exception e) {
-                        Log.e("MainActivity", "onResponseFailure : " + e);
+                    protected void onApiFailure(String message) {
+                        Log.e("MainActivity", "onResponseFailure : " + message);
                     }
+
                 });
     }
 
