@@ -36,10 +36,10 @@ public class OkHttpRequest {
     private ProgressListener responseProgressListener;
     private Params params;
 
+    private ThreadMode threadMode = ThreadMode.MAIN;
+
     private OkHttpClient okHttpClient;
     private Call call;
-
-    private ThreadMode threadMode = ThreadMode.MAIN;
 
     private OkHttpRequest(String url,
                           Headers headers,
@@ -90,12 +90,11 @@ public class OkHttpRequest {
         if (response.isSuccessful()) {
             ResponseBody responseBody = response.body();
             try {
-                ModelParser<T> modelParser = new ModelParser<>();
                 if (tClass == String.class) {
                     //noinspection unchecked
                     return (T) responseBody.string();
                 } else {
-                    return modelParser.parseResponse(responseBody, tClass);
+                    return ModelParser.parseResponseToModel(responseBody, tClass);
                 }
             } finally {
                 responseBody.close();
@@ -104,7 +103,6 @@ public class OkHttpRequest {
             throw new NetworkErrorException(response.toString());
         }
     }
-
 
     public OkHttpRequest threadMode(ThreadMode threadMode) {
         this.threadMode = threadMode;
@@ -118,14 +116,14 @@ public class OkHttpRequest {
 
     private Response executeSyncRequest() throws IOException {
         Request request = buildRequest();
-        okHttpClient = getOkHttpClient();
+        okHttpClient = getCurrentOkHttpClient();
         call = okHttpClient.newCall(request);
         return call.execute();
     }
 
     private void executeAsynRequest(Callback callback) {
         Request request = buildRequest();
-        okHttpClient = getOkHttpClient();
+        okHttpClient = getCurrentOkHttpClient();
         call = okHttpClient.newCall(request);
         call.enqueue(callback);
     }
@@ -156,14 +154,13 @@ public class OkHttpRequest {
         throw new IllegalStateException("The requestMethod only can be METHOD_GET or METHOD_POST.");
     }
 
-    private OkHttpClient getOkHttpClient() {
+    private OkHttpClient getCurrentOkHttpClient() {
         if (responseProgressListener == null) {
             return OkHttpHelper.getOkHttpClient();
         } else {
             OkHttpClient okHttpClient = OkHttpHelper.getOkHttpClient();
             Interceptor responseProgressInterceptor =
                     ProgressHelper.newResponseProgressInterceptor(responseProgressListener);
-
             return okHttpClient.newBuilder()
                     .addNetworkInterceptor(responseProgressInterceptor)
                     .build();

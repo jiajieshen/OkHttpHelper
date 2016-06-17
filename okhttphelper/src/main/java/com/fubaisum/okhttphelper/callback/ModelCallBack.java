@@ -18,11 +18,9 @@ import okhttp3.ResponseBody;
 public abstract class ModelCallBack<T> extends Callback<T> {
 
     private Type modelType;
-    private ModelParser<T> modelParser;
 
     public ModelCallBack() {
         modelType = genericModelType();
-        modelParser = new ModelParser<>();
     }
 
     protected Type genericModelType() {
@@ -54,7 +52,7 @@ public abstract class ModelCallBack<T> extends Callback<T> {
                     //noinspection unchecked
                     sendSuccessCallback((T) responseBody.string());
                 } else {
-                    T result = modelParser.parseResponse(responseBody, modelType);
+                    T result = ModelParser.parseResponseToModel(responseBody, modelType);
                     sendSuccessCallback(result);
                 }
             } catch (Exception e) {

@@ -1,8 +1,7 @@
 package com.fubaisum.okhttphelper.params;
 
 
-import com.fubaisum.okhttphelper.Converter;
-import com.fubaisum.okhttphelper.OkHttpHelper;
+import com.fubaisum.okhttphelper.ModelParser;
 
 import java.io.IOException;
 
@@ -16,23 +15,15 @@ public class JsonParams implements Params {
 
     private final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private String json;
-
+    private RequestBody requestBody;
 
     public JsonParams(String json) {
         this.json = json;
     }
 
     public <T> JsonParams(Class<T> tClass, T t) {
-        Converter.Factory converterFactory = OkHttpHelper.getConverterFactory();
-        if (converterFactory == null) {
-            throw new NullPointerException(
-                    "Please invoke OkHttpHelper.initConverterFactory() method first.");
-        }
-        //noinspection unchecked
-        Converter<T,RequestBody> requestBodyConverter =
-                (Converter<T, RequestBody>) converterFactory.requestBodyConverter(tClass);
         try {
-            RequestBody requestBody = requestBodyConverter.convert(t);
+            requestBody = ModelParser.parseModelToRequestBody(tClass, t);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,6 +31,12 @@ public class JsonParams implements Params {
 
     @Override
     public RequestBody buildRequestBody() {
-        return RequestBody.create(MEDIA_TYPE_JSON, json);
+        if (json != null) {
+            return RequestBody.create(MEDIA_TYPE_JSON, json);
+        } else if (requestBody != null) {
+            return requestBody;
+        } else {
+            throw new RuntimeException();
+        }
     }
 }
