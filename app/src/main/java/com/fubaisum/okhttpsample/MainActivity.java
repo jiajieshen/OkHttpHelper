@@ -29,18 +29,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void testParseModel() {
         new OkHttpRequest.Builder()
-                .url("http://www.baidu.com/")
+                .url("http://fubaisum.github.io/testUser")
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
-                .callback(new ModelCallBack<Object>() {
+                .callback(new ModelCallBack<User>() {
                     @Override
-                    public void onResponseSuccess(Object result) {
-
+                    public void onResponseSuccess(User user) {
+                        Log.e("MainActivity", user.toString());
                     }
 
                     @Override
                     public void onResponseFailure(Exception e) {
-
+                        Log.e("MainActivity", "onResponseFailure : " + e);
                     }
                 });
     }

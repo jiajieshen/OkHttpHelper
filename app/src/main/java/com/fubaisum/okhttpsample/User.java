@@ -4,16 +4,16 @@ package com.fubaisum.okhttpsample;
  * Created by sum on 5/10/16.
  */
 public class User {
-    public String nickname;
-    public String headimgurl;
-    public String phone;
+    public String name;
+    public String age;
+    public String address;
 
     @Override
     public String toString() {
         return "User{" +
-                "nickname='" + nickname + '\'' +
-                ", headimgurl='" + headimgurl + '\'' +
-                ", phone='" + phone + '\'' +
+                "name='" + name + '\'' +
+                ", age='" + age + '\'' +
+                ", address='" + address + '\'' +
                 '}';
     }
 }
