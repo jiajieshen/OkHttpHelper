@@ -31,7 +31,7 @@ public abstract class DownloadCallback extends Callback<String> {
     @Override
     public final void onResponse(Call call, Response response) throws IOException {
         if (destFile == null) {
-            sendFailureCallback(new IllegalArgumentException("The destFile cannot be null."));
+            sendFailureCallback(new NullPointerException("The destFile cannot be null."));
         }
         if (!response.isSuccessful()) {
             sendFailureCallback(new NetworkErrorException(response.toString()));
