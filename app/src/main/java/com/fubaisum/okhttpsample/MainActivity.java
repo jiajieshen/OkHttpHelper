@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         tvTest = (TextView) findViewById(R.id.tv_test);
 
         testParseModel();
+
+        testDownload();
     }
 
     private void testParseModel() {
@@ -47,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testDownload() {
-        File file = new File(getCacheDir().getAbsolutePath(), "test.png");
+        File file = new File(getCacheDir().getAbsolutePath(), "tmp.db");
         new OkHttpRequest.Builder()
-                .url("http://pic41.nipic.com/20140430/18021738_213628575106_2.jpg")
+//                .url("http://pic41.nipic.com/20140430/18021738_213628575106_2.jpg")
+                .url("http://api.youqingjia.com/db/20160614_v1.db")
                 .responseProgress(new UiProgressListener() {
                     @Override
                     public void onUiProgress(long currentBytesCount, long totalBytesCount) {
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build()
+                .threadMode(ThreadMode.BACKGROUND)
                 .callback(new DownloadCallback(file) {
                     @Override
                     public void onResponseSuccess(String fileAbsolutePath) {
