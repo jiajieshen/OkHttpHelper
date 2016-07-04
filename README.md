@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    compile 'com.scausum.okhttphelper:okhttphelper:2.0.7'
-    compile 'com.scausum.okhttphelper:converter-gson:2.0.7'
+    compile 'com.scausum.okhttphelper:okhttphelper:2.0.8'
+    compile 'com.scausum.okhttphelper:converter-gson:2.0.8'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.google.code.gson:gson:2.6.2'
 }
