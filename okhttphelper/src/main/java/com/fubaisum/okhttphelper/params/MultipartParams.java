@@ -2,6 +2,7 @@ package com.fubaisum.okhttphelper.params;
 
 import java.io.File;
 
+import okhttp3.Headers;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
@@ -36,7 +37,7 @@ public class MultipartParams implements Params {
 
     public MultipartParams putJson(String key, String json) {
         RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json);
-        multipartBuilder.addPart(requestBody);
+        multipartBuilder.addPart(Headers.of("Content-Disposition", "form-data; name=\"" + key + "\""), requestBody);
         return this;
     }
 

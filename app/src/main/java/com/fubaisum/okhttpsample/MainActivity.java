@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.fubaisum.okhttphelper.OkHttpRequest;
 import com.fubaisum.okhttphelper.ThreadMode;
 import com.fubaisum.okhttphelper.callback.DownloadCallback;
+import com.fubaisum.okhttphelper.params.MultipartParams;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
 
 import java.io.File;
@@ -26,6 +27,35 @@ public class MainActivity extends AppCompatActivity {
         testParseModel();
 
         testDownload();
+
+        testMultipartParams();
+    }
+
+    private void testMultipartParams() {
+
+        String json = "{\"username\":\"abc\"}";
+
+        MultipartParams params = new MultipartParams();
+        params.put("token", "fsfaiufy8jn2ir");
+        params.putJson("json", json);
+        new OkHttpRequest.Builder()
+                .url("http://fubaisum.github.io/testUser")
+                .post(params)
+                .build()
+                .threadMode(ThreadMode.MAIN)//default
+                .callback(new ApiCallback<User>() {
+
+                    @Override
+                    protected void onApiSuccess(User user) {
+                        Log.e("MainActivity", user.toString());
+                    }
+
+                    @Override
+                    protected void onApiFailure(String message) {
+                        Log.e("MainActivity", "onResponseFailure : " + message);
+                    }
+
+                });
     }
 
     private void testParseModel() {
