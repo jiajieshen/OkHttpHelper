@@ -2,7 +2,6 @@ package com.fubaisum.okhttphelper.params;
 
 import java.io.File;
 
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
@@ -10,9 +9,6 @@ import okhttp3.RequestBody;
  * Created by sum on 15-10-7.
  */
 public class MultipartParams implements Params {
-
-    private final MediaType MEDIA_TYPE_STREAM =
-            MediaType.parse("application/octet-stream;charset=utf-8");
 
     private MultipartBody.Builder multipartBuilder;
 
@@ -35,6 +31,12 @@ public class MultipartParams implements Params {
     public MultipartParams put(String key, String fileName, byte[] bytes) {
         RequestBody fileRequestBody = RequestBody.create(MEDIA_TYPE_STREAM, bytes);
         multipartBuilder.addFormDataPart(key, fileName, fileRequestBody);
+        return this;
+    }
+
+    public MultipartParams putJson(String key, String json) {
+        RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json);
+        multipartBuilder.addPart(requestBody);
         return this;
     }
 

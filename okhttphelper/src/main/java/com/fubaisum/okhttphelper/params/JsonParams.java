@@ -5,7 +5,6 @@ import com.fubaisum.okhttphelper.ModelParser;
 
 import java.io.IOException;
 
-import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
 /**
@@ -13,7 +12,6 @@ import okhttp3.RequestBody;
  */
 public class JsonParams implements Params {
 
-    private final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private String json;
     private RequestBody requestBody;
 
