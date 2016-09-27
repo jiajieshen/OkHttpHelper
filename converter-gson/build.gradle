@@ -30,8 +30,8 @@ android {
 
     resourcePrefix "sum_gson" //随意填写
 
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         minSdkVersion 15
@@ -54,8 +54,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     provided project(':okhttphelper')
-    provided 'com.google.code.gson:gson:2.6.2'
-    provided 'com.squareup.okhttp3:okhttp:3.2.0'
+    provided 'com.google.code.gson:gson:2.7'
+    provided 'com.squareup.okhttp3:okhttp:3.4.0'
 }
 
 group = publishedGroupId                               // Maven Group ID for the artifact
