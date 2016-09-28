@@ -10,10 +10,10 @@ repositories {
 }
 
 dependencies {
-    compile 'com.scausum.okhttphelper:okhttphelper:2.1.0'
-    compile 'com.scausum.okhttphelper:converter-gson:2.1.0'
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.scausum.okhttphelper:okhttphelper:2.1.3'
+    compile 'com.scausum.okhttphelper:converter-gson:2.1.3'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.google.code.gson:gson:2.7'
 }
 
 </code></pre>
@@ -23,23 +23,28 @@ dependencies {
 构建Get请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
-                .url(url)
-                .appendUrlParam(key, value)
-                .appendHeader(line)
-                .appendHeader(key, value)
-                .responseProgress(progressListener)
+                .setTag(tag)
+                .setUrl(url)
+                .appendUrlPath(path)
+                .addUrlQuery(key,value)
+                .addHeader(line)
+                .addHeader(key, value)
+                .setResponseProgressListener(progressListener)
+                .get()
                 .build();
 
 构建Post请求
 
         OkHttpRequest okHttpRequest = new OkHttpRequest.Builder()
-                .url(url)
-                .appendUrlParam(key, value)
-                .appendHeader(line)
-                .appendHeader(key, value)
+                .setTag(tag)
+                .setUrl(url)
+                .appendUrlPath(path)
+                .addUrlQuery(key,value)
+                .addHeader(line)
+                .addHeader(key, value)
+                .setRequestProgressListener(requestProgressListener)
+                .setResponseProgressListener(responseProgressListener)
                 .post(okHttpParams)
-                .requestProgress(requestProgressListener)
-                .responseProgress(responseProgressListener)
                 .build();
 
 Post参数构建
