@@ -94,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
         params.putJson("userJson", User.class, user);
 
         new OkHttpRequest.Builder()
-                .setUrl("http://fubaisum.github.io/testUser")
-                .post(params)
+                .setUrl(testUrl)
+//                .post(params)
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
                 .callback(new ApiCallback<User>() {
