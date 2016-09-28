@@ -19,13 +19,14 @@ public class MyApplication extends Application {
         super.onCreate();
 
         // 添加model解析器
-        OkHttpHelper.initConverterFactory(GsonConverterFactory.create());
+        OkHttpHelper.setConverterFactory(GsonConverterFactory.create());
 
         // 添加Stetho网络拦截器
         Stetho.initializeWithDefaults(this);
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addNetworkInterceptor(new StethoInterceptor())
+                .addNetworkInterceptor(new ResponseInterceptor())
                 .build();
-        OkHttpHelper.initOkHttpClient(okHttpClient);
+        OkHttpHelper.setOkHttpClient(okHttpClient);
     }
 }

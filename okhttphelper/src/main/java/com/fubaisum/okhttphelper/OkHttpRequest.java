@@ -1,6 +1,7 @@
 package com.fubaisum.okhttphelper;
 
 import android.accounts.NetworkErrorException;
+import android.text.TextUtils;
 
 import com.fubaisum.okhttphelper.callback.Callback;
 import com.fubaisum.okhttphelper.params.Params;
@@ -24,37 +25,38 @@ import okhttp3.ResponseBody;
  */
 public class OkHttpRequest {
 
+    private static class METHOD {
+        private static final String UNKNOWN = "UNKNOWN";
+        private static final String GET = "GET";
+        private static final String HEAD = "HEAD";
+        private static final String POST = "POST";
+        private static final String DELETE = "DELETE";
+        private static final String PUT = "PUT";
+        private static final String PATCH = "PATCH";
+    }
 
-    private static final int METHOD_GET = 0;
-    private static final int METHOD_POST = 1;
-
-    private int requestMethod = METHOD_GET;
-
+    private Object tag;
     private String url;
     private Headers headers;
+    private Params params;
+    private String requestMethod = METHOD.GET;
+    private ThreadMode threadMode = ThreadMode.MAIN;
     private ProgressListener requestProgressListener;
     private ProgressListener responseProgressListener;
-    private Params params;
-
-    private ThreadMode threadMode = ThreadMode.MAIN;
 
     private OkHttpClient okHttpClient;
-    private Call call;
 
-    private OkHttpRequest(String url,
-                          Headers headers,
-                          Params params,
+    private OkHttpRequest(Object tag, String url, Headers headers, String method, Params params,
                           ProgressListener requestProgressListener,
                           ProgressListener responseProgressListener) {
+        this.tag = tag;
         this.url = url;
         this.headers = headers;
+        this.requestMethod = method;
         this.params = params;
         this.requestProgressListener = requestProgressListener;
         this.responseProgressListener = responseProgressListener;
 
-        if (null != params) {
-            this.requestMethod = METHOD_POST;
-        }
     }
 
     public InputStream byteStream() throws Exception {
@@ -111,47 +113,52 @@ public class OkHttpRequest {
 
     public <T> void callback(Callback<T> callback) {
         callback.setThreadMode(threadMode);
+        callback.setPlatform(OkHttpHelper.getPlatform());
         executeAsynRequest(callback);
     }
 
     private Response executeSyncRequest() throws IOException {
         Request request = buildRequest();
         okHttpClient = getCurrentOkHttpClient();
-        call = okHttpClient.newCall(request);
-        return call.execute();
+        return okHttpClient.newCall(request).execute();
     }
 
     private void executeAsynRequest(Callback callback) {
         Request request = buildRequest();
         okHttpClient = getCurrentOkHttpClient();
-        call = okHttpClient.newCall(request);
-        call.enqueue(callback);
+        okHttpClient.newCall(request).enqueue(callback);
     }
 
     private Request buildRequest() {
-        switch (requestMethod) {
-            case METHOD_GET: {
-                if (headers == null) {
-                    return new Request.Builder().url(url).build();
-                } else {
-                    return new Request.Builder().url(url).headers(headers).build();
-                }
-            }
-            case METHOD_POST: {
-                RequestBody requestBody = params.buildRequestBody();
-                if (requestProgressListener != null) {
-                    requestBody = ProgressHelper.wrappedRequestProgress(
-                            requestBody, requestProgressListener);
-                }
-
-                if (headers == null) {
-                    return new Request.Builder().url(url).post(requestBody).build();
-                } else {
-                    return new Request.Builder().url(url).headers(headers).post(requestBody).build();
-                }
-            }
+        Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.tag(tag).url(url);
+        if (headers != null) {
+            requestBuilder.headers(headers);
         }
-        throw new IllegalStateException("The requestMethod only can be METHOD_GET or METHOD_POST.");
+        switch (requestMethod) {
+            case METHOD.GET: {
+                // do nothing
+            }
+            break;
+            case METHOD.HEAD: {
+                requestBuilder.head();
+            }
+            break;
+            case METHOD.POST:
+            case METHOD.DELETE:
+            case METHOD.PUT:
+            case METHOD.PATCH: {
+                if (params != null) {
+                    RequestBody requestBody = params.buildRequestBody();
+                    if (requestProgressListener != null) {
+                        requestBody = ProgressHelper.wrappedRequestProgress(requestBody, requestProgressListener);
+                    }
+                    requestBuilder.post(requestBody);
+                }
+            }
+            break;
+        }
+        return requestBuilder.build();
     }
 
     private OkHttpClient getCurrentOkHttpClient() {
@@ -168,32 +175,57 @@ public class OkHttpRequest {
     }
 
     public void cancel() {
-        if (call != null && !call.isCanceled()) {
-            call.cancel();
+        if (tag == null) {
+            throw new NullPointerException("The tag is null.");
+        }
+        for (Call call : okHttpClient.dispatcher().queuedCalls()) {
+            if (tag.equals(call.request().tag())) {
+                call.cancel();
+            }
+        }
+        for (Call call : okHttpClient.dispatcher().runningCalls()) {
+            if (tag.equals(call.request().tag())) {
+                call.cancel();
+            }
         }
     }
 
     public static class Builder {
 
-        private String url;
-        private StringBuilder urlBuilder = new StringBuilder();
+        private Object tag;
+        private StringBuilder urlPathBuilder = new StringBuilder();
+        private StringBuilder urlQueryBuilder;
         private Headers.Builder headersBuilder;
-        private Params params;
         private ProgressListener requestProgressListener;
         private ProgressListener responseProgressListener;
+        private String method = METHOD.UNKNOWN;
+        private Params params;
 
-        public Builder url(String url) {
-            this.urlBuilder.append(url);
-            this.urlBuilder.append("?");
+        public Builder setTag(Object tag) {
+            this.tag = tag;
             return this;
         }
 
-        public Builder appendUrlParam(String key, String value) {
-            urlBuilder.append(key).append("=").append(value).append("&");
+        public Builder setUrl(String url) {
+            urlPathBuilder.append(url);
             return this;
         }
 
-        public Builder appendHeader(String line) {
+        public Builder appendUrlPath(String path) {
+            urlPathBuilder.append("/");
+            urlPathBuilder.append(path);
+            return this;
+        }
+
+        public Builder addUrlQuery(String key, String value) {
+            if (urlQueryBuilder == null) {
+                urlQueryBuilder = new StringBuilder();
+            }
+            urlQueryBuilder.append(key).append("=").append(value).append("&");
+            return this;
+        }
+
+        public Builder addHeader(String line) {
             if (headersBuilder == null) {
                 headersBuilder = new Headers.Builder();
             }
@@ -201,7 +233,7 @@ public class OkHttpRequest {
             return this;
         }
 
-        public Builder appendHeader(String key, String value) {
+        public Builder addHeader(String key, String value) {
             if (headersBuilder == null) {
                 headersBuilder = new Headers.Builder();
             }
@@ -209,26 +241,70 @@ public class OkHttpRequest {
             return this;
         }
 
-        public Builder post(Params params) {
-            this.params = params;
+        public Builder setRequestProgressListener(ProgressListener progressListener) {
+            requestProgressListener = progressListener;
             return this;
         }
 
-        public Builder requestProgress(ProgressListener progressListener) {
-            this.requestProgressListener = progressListener;
+        public Builder setResponseProgressListener(ProgressListener progressListener) {
+            responseProgressListener = progressListener;
             return this;
         }
 
-        public Builder responseProgress(ProgressListener progressListener) {
-            this.responseProgressListener = progressListener;
+        public Builder get() {
+            method = METHOD.GET;
             return this;
         }
 
+        public Builder post(Params p) {
+            method = METHOD.POST;
+            params = p;
+            return this;
+        }
+
+        public Builder head() {
+            method = METHOD.HEAD;
+            return this;
+        }
+
+        public Builder delete(Params p) {
+            method = METHOD.DELETE;
+            params = p;
+            return this;
+        }
+
+        public Builder put(Params p) {
+            method = METHOD.PUT;
+            params = p;
+            return this;
+        }
+
+        public Builder patch(Params p) {
+            method = METHOD.PATCH;
+            params = p;
+            return this;
+        }
 
         public OkHttpRequest build() {
-            url = urlBuilder.deleteCharAt(urlBuilder.length() - 1).toString();
+
+            if (METHOD.UNKNOWN.equals(method)) {
+                throw new IllegalArgumentException("The method is unknown.");
+            }
+
+            if (urlQueryBuilder != null) {
+                urlQueryBuilder.deleteCharAt(urlQueryBuilder.length() - 1);
+
+                urlPathBuilder.append("?");
+                urlPathBuilder.append(urlQueryBuilder.toString());
+            }
+            String url = urlPathBuilder.toString();
+            if (TextUtils.isEmpty(url)) {
+                throw new IllegalArgumentException("The setUrl is null.");
+            }
+
             Headers headers = headersBuilder != null ? headersBuilder.build() : null;
-            return new OkHttpRequest(url, headers, params,
+
+            return new OkHttpRequest(tag, url, headers, method, params,
                     requestProgressListener, responseProgressListener);
         }
     }

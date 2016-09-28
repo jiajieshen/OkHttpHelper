@@ -1,9 +1,7 @@
 package com.fubaisum.okhttphelper.callback;
 
 
-import android.os.Handler;
-import android.os.Looper;
-
+import com.fubaisum.okhttphelper.Platform;
 import com.fubaisum.okhttphelper.ThreadMode;
 
 /**
@@ -11,18 +9,25 @@ import com.fubaisum.okhttphelper.ThreadMode;
  */
 public abstract class Callback<T> implements okhttp3.Callback {
 
-    private static Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private ThreadMode threadMode = ThreadMode.MAIN;
+    private Platform platform;
 
     public void setThreadMode(ThreadMode threadMode) {
         this.threadMode = threadMode;
     }
 
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
+
     protected final void sendFailureCallback(final Exception e) {
         switch (threadMode) {
             case MAIN: {
-                mainHandler.post(new Runnable() {
+                if (platform == null) {
+                    throw new NullPointerException("The platform is null.");
+                }
+                platform.execute(new Runnable() {
                     @Override
                     public void run() {
                         onResponseFailure(e);
@@ -40,7 +45,10 @@ public abstract class Callback<T> implements okhttp3.Callback {
     protected final void sendSuccessCallback(final T result) {
         switch (threadMode) {
             case MAIN: {
-                mainHandler.post(new Runnable() {
+                if (platform == null) {
+                    throw new NullPointerException("The platform is null.");
+                }
+                platform.execute(new Runnable() {
                     @Override
                     public void run() {
                         onResponseSuccess(result);

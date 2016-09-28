@@ -5,14 +5,14 @@ package com.fubaisum.okhttpsample;
  */
 public class User {
     public String name;
-    public String age;
+    public String avatar;
     public String address;
 
     @Override
     public String toString() {
         return "User{" +
                 "name='" + name + '\'' +
-                ", age='" + age + '\'' +
+                ", avatar='" + avatar + '\'' +
                 ", address='" + address + '\'' +
                 '}';
     }

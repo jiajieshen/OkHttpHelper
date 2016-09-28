@@ -1,6 +1,9 @@
 package com.fubaisum.okhttphelper.params;
 
+import com.fubaisum.okhttphelper.ModelParser;
+
 import java.io.File;
+import java.io.IOException;
 
 import okhttp3.Headers;
 import okhttp3.MultipartBody;
@@ -22,6 +25,16 @@ public class MultipartParams implements Params {
         return this;
     }
 
+    public <T> MultipartParams put(String key, Class<T> tClass, T t) {
+        try {
+            String value = ModelParser.parseModelToString(tClass, t);
+            multipartBuilder.addFormDataPart(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return this;
+    }
+
     public MultipartParams put(String key, File file) {
         String fileName = file.getName();
         RequestBody fileRequestBody = RequestBody.create(MEDIA_TYPE_STREAM, file);
@@ -37,7 +50,21 @@ public class MultipartParams implements Params {
 
     public MultipartParams putJson(String key, String json) {
         RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON, json);
-        multipartBuilder.addPart(Headers.of("Content-Disposition", "form-data; name=\"" + key + "\""), requestBody);
+        multipartBuilder.addPart(
+                Headers.of("Content-Disposition", "form-data; name=\"" + key + "\""),
+                requestBody);
+        return this;
+    }
+
+    public <T> MultipartParams putJson(String key, Class<T> tClass, T t) {
+        try {
+            RequestBody requestBody = ModelParser.parseModelToRequestBody(tClass, t);
+            multipartBuilder.addPart(
+                    Headers.of("Content-Disposition", "form-data; name=\"" + key + "\""),
+                    requestBody);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 

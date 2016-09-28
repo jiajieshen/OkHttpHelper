@@ -38,4 +38,10 @@ public final class GsonConverterFactory extends Converter.Factory {
         TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
         return new GsonRequestBodyConverter<>(gson, adapter);
     }
+
+    @Override
+    public Converter<?, String> stringConverter(Type type) {
+        TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
+        return new GsonStringConverter<>(gson, adapter);
+    }
 }

@@ -16,13 +16,10 @@ public class ModelParser {
     }
 
     public static <T> T parseResponseToModel(ResponseBody responseBody, Type modelType) throws Exception {
-        Converter.Factory converterFactory = OkHttpHelper.getConverterFactory();
-        if (converterFactory == null) {
-            throw new NullPointerException("Please invoke OkHttpHelper.initConverterFactory() method first.");
-        }
+        Converter.Factory converterFactory = getConverterFactory();
         //noinspection unchecked
-        Converter<ResponseBody, T> responseConverter
-                = (Converter<ResponseBody, T>) converterFactory.responseBodyConverter(modelType);
+        Converter<ResponseBody, T> responseConverter = (Converter<ResponseBody, T>)
+                converterFactory.responseBodyConverter(modelType);
         return responseConverter.convert(responseBody);
     }
 
@@ -32,8 +29,27 @@ public class ModelParser {
             throw new NullPointerException("Please invoke OkHttpHelper.initConverterFactory() method first.");
         }
         //noinspection unchecked
-        Converter<T, RequestBody> requestBodyConverter =
-                (Converter<T, RequestBody>) converterFactory.requestBodyConverter(modelType);
+        Converter<T, RequestBody> requestBodyConverter = (Converter<T, RequestBody>)
+                converterFactory.requestBodyConverter(modelType);
         return requestBodyConverter.convert(value);
+    }
+
+    public static <T> String parseModelToString(Type modelType, T value) throws Exception {
+        Converter.Factory converterFactory = getConverterFactory();
+        //noinspection unchecked
+        Converter<T, String> stringConverter = (Converter<T, String>)
+                converterFactory.stringConverter(modelType);
+        if (stringConverter == null) {
+            throw new NullPointerException("ConverterFactory.stringConverter() return null.");
+        }
+        return stringConverter.convert(value);
+    }
+
+    private static Converter.Factory getConverterFactory() {
+        Converter.Factory converterFactory = OkHttpHelper.getConverterFactory();
+        if (converterFactory == null) {
+            throw new NullPointerException("OkHttpHelper.getConverterFactory() return null.");
+        }
+        return converterFactory;
     }
 }

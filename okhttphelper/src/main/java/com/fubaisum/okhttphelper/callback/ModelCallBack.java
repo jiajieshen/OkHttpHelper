@@ -44,7 +44,7 @@ public abstract class ModelCallBack<T> extends Callback<T> {
     @Override
     public final void onResponse(Call call, Response response) throws IOException {
         if (!response.isSuccessful()) {
-            sendFailureCallback(new NetworkErrorException(response.toString()));
+            sendFailureCallback(new NetworkErrorException(response.message()));
         } else {
             ResponseBody responseBody = response.body();
             try {

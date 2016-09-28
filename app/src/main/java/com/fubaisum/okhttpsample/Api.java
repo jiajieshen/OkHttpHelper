@@ -5,14 +5,14 @@ package com.fubaisum.okhttpsample;
  */
 public class Api<T> {
     boolean status;
-    String message;
+    String msg;
     T data;
 
     @Override
     public String toString() {
         return "Api{" +
                 "status=" + status +
-                ", message='" + message + '\'' +
+                ", msg='" + msg + '\'' +
                 ", data=" + data +
                 '}';
     }

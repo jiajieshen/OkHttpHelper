@@ -3,7 +3,6 @@ package com.fubaisum.okhttpsample;
 import android.util.Log;
 
 import com.fubaisum.okhttphelper.callback.ModelCallBack;
-import com.google.gson.internal.$Gson$Types;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -18,7 +17,7 @@ public abstract class ApiCallback<T> extends ModelCallBack<Api<T>> {
     @Override
     protected Type genericModelType() {
         final Type subType = getGenericTypeParameter(getClass());
-        Type modelType = new ParameterizedType() {
+        return new ParameterizedType() {
 
             @Override
             public Type[] getActualTypeArguments() {
@@ -35,26 +34,24 @@ public abstract class ApiCallback<T> extends ModelCallBack<Api<T>> {
                 return Api.class;
             }
         };
-        modelType = $Gson$Types.canonicalize(modelType);
-        Log.e("ApiCallback", "ModelType = " + modelType);
-        return modelType;
     }
 
-    protected abstract void onApiSuccess(T data);
+    protected abstract void onApiSuccess(String message, T data);
 
-    protected abstract void onApiFailure(String message);
+    protected void onApiFailure(String message) {
+    }
 
     @Override
-    public void onResponseSuccess(Api<T> result) {
+    public final void onResponseSuccess(Api<T> result) {
         if (result.status) {
-            onApiSuccess(result.data);
+            onApiSuccess(result.msg, result.data);
         } else {
-            onApiFailure(result.message);
+            onApiFailure(result.msg);
         }
     }
 
     @Override
-    public void onResponseFailure(Exception e) {
+    public final void onResponseFailure(Exception e) {
         Log.e("ApiCallback", "Network error = " + e);
         onApiFailure(NETWORK_ERROR);
     }

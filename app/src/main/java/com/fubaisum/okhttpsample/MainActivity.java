@@ -12,10 +12,14 @@ import com.fubaisum.okhttphelper.params.MultipartParams;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String testUrl = "https://raw.githubusercontent.com/fubaisum/AndroidCollections/master/testUser.json";
     private TextView tvTest;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,29 +28,40 @@ public class MainActivity extends AppCompatActivity {
 
         tvTest = (TextView) findViewById(R.id.tv_test);
 
-        testParseModel();
-
-        testDownload();
-
-        testMultipartParams();
+        testSyncString();
+//        testParseModel();
+//        testDownload();
+//        testMultipartParams();
     }
 
-    private void testMultipartParams() {
+    private void testSyncString() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String result = new OkHttpRequest.Builder()
+                            .setUrl(testUrl)
+                            .get()
+                            .build()
+                            .string();
+                    Log.e("MainActivity", "sync string result = " + result);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
-        String json = "{\"username\":\"abc\"}";
-
-        MultipartParams params = new MultipartParams();
-        params.put("token", "fsfaiufy8jn2ir");
-        params.putJson("json", json);
+    private void testParseModel() {
         new OkHttpRequest.Builder()
-                .url("http://fubaisum.github.io/testUser")
-                .post(params)
+                .setUrl("https://github.com/fubaisum/AndroidCollections/testUser.json")
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
                 .callback(new ApiCallback<User>() {
 
                     @Override
-                    protected void onApiSuccess(User user) {
+                    protected void onApiSuccess(String msg, User user) {
                         Log.e("MainActivity", user.toString());
                     }
 
@@ -58,15 +73,22 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void testParseModel() {
+    private void testMultipartParams() {
+
+        String json = "{\"username\":\"abc\"}";
+
+        MultipartParams params = new MultipartParams();
+        params.put("token", "fsfaiufy8jn2ir");
+        params.putJson("json", json);
         new OkHttpRequest.Builder()
-                .url("http://fubaisum.github.io/testUser")
+                .setUrl("http://fubaisum.github.io/testUser")
+                .post(params)
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
                 .callback(new ApiCallback<User>() {
 
                     @Override
-                    protected void onApiSuccess(User user) {
+                    protected void onApiSuccess(String msg, User user) {
                         Log.e("MainActivity", user.toString());
                     }
 
@@ -81,9 +103,9 @@ public class MainActivity extends AppCompatActivity {
     private void testDownload() {
         File file = new File(getCacheDir().getAbsolutePath(), "tmp.db");
         new OkHttpRequest.Builder()
-//                .url("http://pic41.nipic.com/20140430/18021738_213628575106_2.jpg")
-                .url("http://api.youqingjia.com/db/20160614_v1.db")
-                .responseProgress(new UiProgressListener() {
+//                .setUrl("http://pic41.nipic.com/20140430/18021738_213628575106_2.jpg")
+                .setUrl("http://api.youqingjia.com/db/20160614_v1.db")
+                .setResponseProgressListener(new UiProgressListener() {
                     @Override
                     public void onUiProgress(long currentBytesCount, long totalBytesCount) {
                         if (totalBytesCount == -1) {

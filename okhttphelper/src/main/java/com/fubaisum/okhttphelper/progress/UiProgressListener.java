@@ -1,8 +1,6 @@
 package com.fubaisum.okhttphelper.progress;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import com.fubaisum.okhttphelper.Platform;
 
 import java.lang.ref.WeakReference;
 
@@ -11,29 +9,40 @@ import java.lang.ref.WeakReference;
  */
 public abstract class UiProgressListener implements ProgressListener {
 
-    private static final int MSG_UI_PROGRESS = 0x123;
     private static final long DEFAULT_PROGRESS_PERIOD = 600;
 
-    private final UiHandler uiHandler = new UiHandler(this);
-    private long currentBytesCount;
-    private long totalBytesCount;
+    private long progressPeriod;
+    private Platform platform;
+    private UiRunnable uiRunnable;
+
     private boolean isFirst = true;
     private long startTimeMillis;
-    private long progressPeriod;
+
+    private long currentBytesCount;
+    private long totalBytesCount;
+
+    public UiProgressListener() {
+        this(0);
+    }
+
+    public UiProgressListener(long progressPeriod) {
+        this.progressPeriod = progressPeriod > 0 ? progressPeriod : DEFAULT_PROGRESS_PERIOD;
+        platform = Platform.get();
+        uiRunnable = new UiRunnable(this);
+    }
 
     @Override
     public final void onProgress(long currentBytesCount, long totalBytesCount) {
         if (isFirst) {
             isFirst = false;
             startTimeMillis = System.currentTimeMillis();
-            progressPeriod = getUiProgressPeriod();
         } else if (currentBytesCount == totalBytesCount) {
             /**
              * 请求/响应结束时，必须回调进度
              */
             this.currentBytesCount = currentBytesCount;
             this.totalBytesCount = totalBytesCount;
-            uiHandler.sendEmptyMessage(MSG_UI_PROGRESS);
+            platform.execute(uiRunnable);
         } else {
             /**
              * 请求/响应过程中，至少延迟指定的周期，才回调进度
@@ -43,36 +52,29 @@ public abstract class UiProgressListener implements ProgressListener {
                 startTimeMillis = crrTimeMillis;
                 this.currentBytesCount = currentBytesCount;
                 this.totalBytesCount = totalBytesCount;
-                uiHandler.sendEmptyMessage(MSG_UI_PROGRESS);
+                platform.execute(uiRunnable);
             }
         }
-    }
-
-    protected long getUiProgressPeriod() {
-        return DEFAULT_PROGRESS_PERIOD;
     }
 
     protected abstract void onUiProgress(long currentBytesCount, long totalBytesCount);
 
-    private static class UiHandler extends Handler {
+    private static class UiRunnable implements Runnable {
 
-        private WeakReference<UiProgressListener> weakReference;
+        private WeakReference<UiProgressListener> reference;
 
-        private UiHandler(UiProgressListener uiProgressListener) {
-            super(Looper.getMainLooper());
-            weakReference = new WeakReference<>(uiProgressListener);
+        UiRunnable(UiProgressListener uiProgressListener) {
+            reference = new WeakReference<>(uiProgressListener);
         }
 
         @Override
-        public void handleMessage(Message msg) {
-            if (msg.what != MSG_UI_PROGRESS) {
-                return;
-            }
-            UiProgressListener uiProgressListener = weakReference.get();
-            if (null != uiProgressListener) {
+        public void run() {
+            UiProgressListener uiProgressListener = reference.get();
+            if (uiProgressListener != null) {
                 uiProgressListener.onUiProgress(
                         uiProgressListener.currentBytesCount, uiProgressListener.totalBytesCount);
             }
         }
     }
+
 }

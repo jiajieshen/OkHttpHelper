@@ -1,5 +1,9 @@
 package com.fubaisum.okhttphelper.params;
 
+import com.fubaisum.okhttphelper.ModelParser;
+
+import java.io.IOException;
+
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 
@@ -17,6 +21,16 @@ public class FormParams implements Params {
 
     public FormParams put(String key, String value) {
         formBodyBuilder.add(key, value);
+        return this;
+    }
+
+    public <T> FormParams put(String key, Class<T> tClass, T t) {
+        try {
+            String value = ModelParser.parseModelToString(tClass, t);
+            formBodyBuilder.add(key, value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
