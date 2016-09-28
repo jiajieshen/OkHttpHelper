@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.fubaisum.okhttphelper.OkHttpRequest;
 import com.fubaisum.okhttphelper.ThreadMode;
 import com.fubaisum.okhttphelper.callback.DownloadCallback;
+import com.fubaisum.okhttphelper.params.FormParams;
 import com.fubaisum.okhttphelper.params.MultipartParams;
 import com.fubaisum.okhttphelper.progress.UiProgressListener;
 
@@ -29,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
         tvTest = (TextView) findViewById(R.id.tv_test);
 
         testSyncString();
-//        testParseModel();
+        testParseModel();
+        testMultipartParams();
 //        testDownload();
-//        testMultipartParams();
     }
 
     private void testSyncString() {
@@ -54,8 +55,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testParseModel() {
+        User user = new User();
+        user.name = "abc";
+        user.address = "unknown";
+        FormParams params = new FormParams();
+        params.put("user", User.class, user);
         new OkHttpRequest.Builder()
-                .setUrl("https://github.com/fubaisum/AndroidCollections/testUser.json")
+                .setUrl(testUrl)
+                .post(params)
                 .build()
                 .threadMode(ThreadMode.MAIN)//default
                 .callback(new ApiCallback<User>() {
@@ -75,11 +82,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void testMultipartParams() {
 
-        String json = "{\"username\":\"abc\"}";
+        String json = "{\"name\":\"5555555555555555555555\"}";
+        User user = new User();
+        user.name = "abc";
+        user.address = "unknown";
 
         MultipartParams params = new MultipartParams();
         params.put("token", "fsfaiufy8jn2ir");
         params.putJson("json", json);
+        params.put("user", User.class, user);
+        params.putJson("userJson", User.class, user);
+
         new OkHttpRequest.Builder()
                 .setUrl("http://fubaisum.github.io/testUser")
                 .post(params)
