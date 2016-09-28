@@ -10,6 +10,7 @@ import java.io.IOException;
 import okhttp3.ResponseBody;
 
 final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
+
     private final Gson gson;
     private final TypeAdapter<T> adapter;
 
