@@ -70,10 +70,10 @@ Post参数构建
 
 执行异步请求
 
-        okHttpRequest.threadMode(ThreadMode.MAIN)//default
+        okHttpRequest.callbackThread(ThreadMode.MAIN)//default
                 .uiCallback(okHttpCallback);//Ui线程回调
                 
-        okHttpRequest.threadMode(ThreadMode.BACKGROUND)
+        okHttpRequest.callbackThread(ThreadMode.BACKGROUND)
                 .uiCallback(okHttpCallback);//后台线程回调
 
 Model回调
