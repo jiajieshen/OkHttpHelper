@@ -7,10 +7,13 @@ import com.scausum.okhttp.callback.Callback;
 import com.scausum.okhttp.params.Params;
 import com.scausum.okhttp.progress.ProgressHelper;
 import com.scausum.okhttp.progress.ProgressListener;
+import com.scausum.okhttp.rx.ModelObservableOnSubscribe;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import okhttp3.Call;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
@@ -104,6 +107,18 @@ public class OkHttpCall {
             throw new NetworkErrorException(response.toString());
         }
     }
+
+    public <T> Observable<T> toObservable(ObservableOnSubscribe<T> observableOnSubscribe) {
+        ModelObservableOnSubscribe<T> modelObservableOnSubscribe = new ModelObservableOnSubscribe<>();
+        Request request = buildRequest();
+        okHttpClient = getOkHttpClient();
+        Call call = okHttpClient.newCall(request);
+        modelObservableOnSubscribe.setCall(call);
+
+        return Observable.create(observableOnSubscribe);
+    }
+
+
 
     public <T> void callback(Callback<T> callback) {
         callback.setCallbackThread(callbackThread);

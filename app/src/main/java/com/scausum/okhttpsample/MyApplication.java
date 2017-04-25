@@ -7,6 +7,8 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.scausum.okhttp.OkHttpManager;
 import com.scausum.okhttp.converter.gson.GsonConverterFactory;
 
+import me.drakeet.library.CrashWoodpecker;
+import me.drakeet.library.PatchMode;
 import okhttp3.OkHttpClient;
 
 /**
@@ -17,6 +19,11 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        CrashWoodpecker.instance()
+                .setPatchMode(PatchMode.SHOW_LOG_PAGE)
+                .setPassToOriginalDefaultHandler(true)
+                .flyTo(this);
 
         // 添加model解析器
         OkHttpManager.setConverterFactory(GsonConverterFactory.create());

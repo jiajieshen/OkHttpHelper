@@ -9,12 +9,15 @@ import com.scausum.okhttp.CallbackThread;
 import com.scausum.okhttp.OkHttpCall;
 import com.scausum.okhttp.callback.DownloadCallback;
 import com.scausum.okhttp.params.FormParams;
-import com.scausum.okhttp.params.MultipartParams;
 import com.scausum.okhttp.progress.UiProgressListener;
+import com.scausum.okhttp.rx.ModelObservableOnSubscribe;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
         tvTest = (TextView) findViewById(R.id.tv_test);
 
-        testSyncString();
-        testParseModel();
+//        testSyncString();
+//        testParseModel();
         testMultipartParams();
 //        testDownload();
     }
@@ -75,35 +78,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void testMultipartParams() {
 
-        String json = "{\"name\":\"5555555555555555555555\"}";
-        User user = new User();
-        user.name = "abc";
-        user.address = "unknown";
-
-        MultipartParams params = new MultipartParams();
-        params.put("token", "fsfaiufy8jn2ir");
-        params.putJson("json", json);
-        params.put("user", User.class, user);
-        params.putJson("userJson", User.class, user);
-
+        FormParams params = new FormParams();
+        params.put("lang", "en");
         new OkHttpCall.Builder()
-                .setUrl(testUrl)
-//                .post(params)
-                .callbackThread(CallbackThread.MAIN)//default
+                .setUrl("https://ptt.api.40m.net/user/Index/getLocationInfo")
+                .post(params)
                 .build()
-                .callback(new ApiCallback<User>() {
-
+                .toObservable(new ModelObservableOnSubscribe<Api<LocationList>>())
+                .subscribe(new Consumer<Api<LocationList>>() {
                     @Override
-                    protected void onApiSuccess(String msg, User user) {
-                        Log.e("MainActivity", user.toString());
+                    public void accept(@NonNull Api<LocationList> locationList) throws Exception {
+                        Log.e("MainActivity", locationList.toString());
                     }
-
-                    @Override
-                    protected void onApiFailure(String message) {
-                        Log.e("MainActivity", "onResponseFailure : " + message);
-                    }
-
                 });
+//                .callback(new ApiCallback<User>() {
+//
+//                    @Override
+//                    protected void onApiSuccess(String msg, User user) {
+//                        Log.e("MainActivity", user.toString());
+//                    }
+//
+//                    @Override
+//                    protected void onApiFailure(String message) {
+//                        Log.e("MainActivity", "onResponseFailure : " + message);
+//                    }
+//
+//                });
     }
 
     private void testDownload() {
