@@ -11,6 +11,7 @@ import com.scausum.okhttp.callback.DownloadCallback;
 import com.scausum.okhttp.params.FormParams;
 import com.scausum.okhttp.progress.UiProgressListener;
 import com.scausum.okhttp.rx.ModelObservableOnSubscribe;
+import com.scausum.okhttp.rx.SchedularUtil;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -76,6 +77,17 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private abstract class ApiConsumer<T> implements Consumer<Api<T>> {
+
+        @Override
+        public void accept(@NonNull Api<T> api) throws Exception {
+            accept(api.data, api.msg);
+        }
+
+        public abstract void accept(@NonNull T t, String msg) throws Exception;
+
+    }
+
     private void testMultipartParams() {
 
         FormParams params = new FormParams();
@@ -84,13 +96,15 @@ public class MainActivity extends AppCompatActivity {
                 .setUrl("https://ptt.api.40m.net/user/Index/getLocationInfo")
                 .post(params)
                 .build()
-                .toObservable(new ModelObservableOnSubscribe<Api<LocationList>>())
-                .subscribe(new Consumer<Api<LocationList>>() {
+                .toObservable(new ModelObservableOnSubscribe<Api<LocationList>>() {})
+                .compose(SchedularUtil.<Api<LocationList>>ioToAndroidMain())
+                .subscribe(new ApiConsumer<LocationList>() {
                     @Override
-                    public void accept(@NonNull Api<LocationList> locationList) throws Exception {
-                        Log.e("MainActivity", locationList.toString());
+                    public void accept(@NonNull LocationList locationList, String msg) throws Exception {
+
                     }
                 });
+
 //                .callback(new ApiCallback<User>() {
 //
 //                    @Override

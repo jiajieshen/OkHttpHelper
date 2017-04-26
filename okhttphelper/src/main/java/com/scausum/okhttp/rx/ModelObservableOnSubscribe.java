@@ -24,6 +24,10 @@ public class ModelObservableOnSubscribe<T> implements ObservableOnSubscribe<T> {
     private Type modelType;
     private Call call;
 
+    public static <T> ModelObservableOnSubscribe<T> create() {
+        return new ModelObservableOnSubscribe<T>(){};
+    }
+
     public ModelObservableOnSubscribe() {
         modelType = genericModelType();
     }
@@ -34,9 +38,9 @@ public class ModelObservableOnSubscribe<T> implements ObservableOnSubscribe<T> {
 
     protected static Type getGenericTypeParameter(Class<?> thisClass) {
         Type genericSuperclass = thisClass.getGenericSuperclass();
-//        if (genericSuperclass instanceof Class) {
-//            throw new RuntimeException("Missing modelType parameter.");
-//        }
+        if (genericSuperclass instanceof Class) {
+            throw new RuntimeException("Missing modelType parameter.");
+        }
 
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type type = parameterizedType.getActualTypeArguments()[0];

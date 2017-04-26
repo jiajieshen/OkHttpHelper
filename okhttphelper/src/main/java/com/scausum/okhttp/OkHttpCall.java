@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
 import okhttp3.Call;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
@@ -108,14 +107,13 @@ public class OkHttpCall {
         }
     }
 
-    public <T> Observable<T> toObservable(ObservableOnSubscribe<T> observableOnSubscribe) {
-        ModelObservableOnSubscribe<T> modelObservableOnSubscribe = new ModelObservableOnSubscribe<>();
+    public <T> Observable<T> toObservable(ModelObservableOnSubscribe<T> modelObservableOnSubscribe) {
         Request request = buildRequest();
         okHttpClient = getOkHttpClient();
         Call call = okHttpClient.newCall(request);
         modelObservableOnSubscribe.setCall(call);
 
-        return Observable.create(observableOnSubscribe);
+        return Observable.create(modelObservableOnSubscribe);
     }
 
 
